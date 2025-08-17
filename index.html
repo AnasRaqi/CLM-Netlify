@@ -698,6 +698,43 @@
             color: #3498db;
         }
 
+        /* Loading Animation */
+        .loading {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* OCR Steps */
+        .ocr-step {
+            min-height: 300px;
+        }
+
+        /* GenAI Contract Preview */
+        #contractPreview {
+            border: 1px solid #ddd;
+            font-family: 'Times New Roman', serif;
+        }
+
+        #contractPreview h2, #contractPreview h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        #contractPreview p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
         .activity-icon.vendor {
             background: #fef9e7;
             color: #f39c12;
@@ -1105,6 +1142,12 @@
                             <div class="table-actions">
                                 <button class="btn btn-primary" onclick="openAddContractModal()">
                                     <i>➕</i> Add Contract
+                                </button>
+                                <button class="btn btn-success" onclick="openGenAIContractModal()">
+                                    <i>🤖</i> GenAI Contract
+                                </button>
+                                <button class="btn btn-warning" onclick="openOCRUploadModal()">
+                                    <i>📄</i> OCR Upload
                                 </button>
                                 <button class="btn btn-secondary" onclick="generateContractReport()">
                                     <i>📊</i> Generate Report
@@ -2003,6 +2046,270 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="saveUser()">Save User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GenAI Contract Generation Modal -->
+    <div id="genAIContractModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🤖 GenAI Contract Generation</h3>
+                <span class="close" onclick="closeModal('genAIContractModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="genAIContractForm">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Contract Type</label>
+                            <select class="form-control" name="contractType" required>
+                                <option value="">Select Contract Type</option>
+                                <option value="Software License Agreement">Software License Agreement</option>
+                                <option value="Professional Services Agreement">Professional Services Agreement</option>
+                                <option value="Maintenance and Support Agreement">Maintenance and Support Agreement</option>
+                                <option value="Consulting Services Agreement">Consulting Services Agreement</option>
+                                <option value="Non-Disclosure Agreement">Non-Disclosure Agreement</option>
+                                <option value="Service Level Agreement">Service Level Agreement</option>
+                            </select>
+                        </div>
+                        <div class="form-col">
+                            <label>Contract Duration</label>
+                            <select class="form-control" name="duration" required>
+                                <option value="">Select Duration</option>
+                                <option value="6 months">6 months</option>
+                                <option value="1 year">1 year</option>
+                                <option value="2 years">2 years</option>
+                                <option value="3 years">3 years</option>
+                                <option value="5 years">5 years</option>
+                                <option value="Custom">Custom Duration</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Party A (Your Organization)</label>
+                            <input type="text" class="form-control" name="partyA" value="RuyaTracker Enterprise" required>
+                        </div>
+                        <div class="form-col">
+                            <label>Party B (Vendor/Contractor)</label>
+                            <select class="form-control" name="partyB" required>
+                                <option value="">Select Vendor</option>
+                                <option value="Microsoft Corporation">Microsoft Corporation</option>
+                                <option value="Oracle Systems">Oracle Systems</option>
+                                <option value="SAP Solutions">SAP Solutions</option>
+                                <option value="IBM Services">IBM Services</option>
+                                <option value="Accenture">Accenture</option>
+                                <option value="Deloitte">Deloitte</option>
+                                <option value="KPMG">KPMG</option>
+                                <option value="PwC">PwC</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Contract Value (SAR)</label>
+                            <input type="number" class="form-control" name="contractValue" required>
+                        </div>
+                        <div class="form-col">
+                            <label>Payment Terms</label>
+                            <select class="form-control" name="paymentTerms" required>
+                                <option value="">Select Payment Terms</option>
+                                <option value="Net 30">Net 30 days</option>
+                                <option value="Net 60">Net 60 days</option>
+                                <option value="Net 90">Net 90 days</option>
+                                <option value="Monthly">Monthly payments</option>
+                                <option value="Quarterly">Quarterly payments</option>
+                                <option value="Annual">Annual payment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Governing Law</label>
+                            <select class="form-control" name="governingLaw" required>
+                                <option value="">Select Governing Law</option>
+                                <option value="Kingdom of Saudi Arabia" selected>Kingdom of Saudi Arabia</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="European Union">European Union</option>
+                            </select>
+                        </div>
+                        <div class="form-col">
+                            <label>Currency</label>
+                            <select class="form-control" name="currency" required>
+                                <option value="SAR" selected>SAR (Saudi Riyal)</option>
+                                <option value="USD">USD (US Dollar)</option>
+                                <option value="EUR">EUR (Euro)</option>
+                                <option value="GBP">GBP (British Pound)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Special Requirements/Clauses</label>
+                            <textarea class="form-control" name="specialRequirements" rows="3" placeholder="Enter any specific requirements, clauses, or terms you want included in the contract..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Include Standard Clauses</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" name="clauses" value="confidentiality" checked> Confidentiality
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" name="clauses" value="termination" checked> Termination
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" name="clauses" value="liability" checked> Liability Limitation
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" name="clauses" value="intellectual_property" checked> Intellectual Property
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" name="clauses" value="force_majeure" checked> Force Majeure
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" name="clauses" value="dispute_resolution" checked> Dispute Resolution
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div id="genAIProgress" style="display: none; text-align: center; padding: 20px;">
+                    <div class="loading"></div>
+                    <p style="margin-top: 10px;">Generating contract with AI... Please wait.</p>
+                </div>
+                <div id="genAIResult" style="display: none;">
+                    <h4 style="color: #27ae60; margin-bottom: 15px;">✅ Contract Generated Successfully!</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <h5>Generated Contract Preview:</h5>
+                        <div id="contractPreview" style="max-height: 300px; overflow-y: auto; background: white; padding: 15px; border-radius: 4px; font-family: 'Times New Roman', serif; line-height: 1.6; font-size: 14px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('genAIContractModal')">Cancel</button>
+                <button type="button" class="btn btn-success" id="generateContractBtn" onclick="generateAIContract()">🤖 Generate Contract</button>
+                <button type="button" class="btn btn-primary" id="saveGeneratedContractBtn" onclick="saveGeneratedContract()" style="display: none;">💾 Save Contract</button>
+                <button type="button" class="btn btn-warning" id="downloadContractBtn" onclick="downloadContract()" style="display: none;">📄 Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OCR Upload Modal -->
+    <div id="ocrUploadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📄 OCR Document Upload & Processing</h3>
+                <span class="close" onclick="closeModal('ocrUploadModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="ocrUploadStep" class="ocr-step">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">Upload Contract Document</h4>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Select Document</label>
+                            <input type="file" class="form-control" id="ocrFileInput" accept=".pdf,.jpg,.jpeg,.png,.tiff,.bmp" required>
+                            <small style="color: #7f8c8d;">Supported formats: PDF, JPG, PNG, TIFF, BMP</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Document Type</label>
+                            <select class="form-control" id="ocrDocumentType" required>
+                                <option value="">Select Document Type</option>
+                                <option value="contract">Contract Agreement</option>
+                                <option value="invoice">Invoice</option>
+                                <option value="purchase_order">Purchase Order</option>
+                                <option value="proposal">Proposal</option>
+                                <option value="amendment">Contract Amendment</option>
+                                <option value="other">Other Document</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Processing Options</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px;">
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="extractText" checked> Extract Full Text
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="extractKeyData" checked> Extract Key Data
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="extractDates" checked> Extract Dates
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="extractAmounts" checked> Extract Amounts
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 5px;">
+                                    <input type="checkbox" id="extractParties" checked> Extract Parties
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ocrProcessingStep" class="ocr-step" style="display: none; text-align: center; padding: 40px;">
+                    <div class="loading"></div>
+                    <h4 style="color: #3498db; margin: 20px 0;">Processing Document...</h4>
+                    <p id="ocrProcessingStatus">Analyzing document structure...</p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Text Extraction:</span>
+                            <span id="textExtractionStatus">⏳ Processing...</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Data Recognition:</span>
+                            <span id="dataRecognitionStatus">⏳ Waiting...</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Contract Analysis:</span>
+                            <span id="contractAnalysisStatus">⏳ Waiting...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ocrResultsStep" class="ocr-step" style="display: none;">
+                    <h4 style="color: #27ae60; margin-bottom: 15px;">✅ OCR Processing Complete!</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h5 style="color: #2c3e50; margin-bottom: 10px;">📊 Extracted Key Data</h5>
+                            <div id="extractedKeyData">
+                                <!-- Key data will be populated here -->
+                            </div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <h5 style="color: #2c3e50; margin-bottom: 10px;">📅 Important Dates</h5>
+                            <div id="extractedDates">
+                                <!-- Dates will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px;">📄 Extracted Text</h5>
+                        <div id="extractedText" style="max-height: 200px; overflow-y: auto; background: white; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; line-height: 1.4;">
+                            <!-- Extracted text will be populated here -->
+                        </div>
+                    </div>
+
+                    <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px;">🤖 AI Contract Analysis</h5>
+                        <div id="contractAnalysis">
+                            <!-- AI analysis will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('ocrUploadModal')">Cancel</button>
+                <button type="button" class="btn btn-primary" id="processOCRBtn" onclick="processOCRDocument()">🔍 Process Document</button>
+                <button type="button" class="btn btn-success" id="createContractFromOCRBtn" onclick="createContractFromOCR()" style="display: none;">📄 Create Contract</button>
+                <button type="button" class="btn btn-warning" id="downloadOCRResultsBtn" onclick="downloadOCRResults()" style="display: none;">📊 Download Results</button>
             </div>
         </div>
     </div>
@@ -3871,6 +4178,549 @@
 
         function exportReport(format) {
             showNotification(`Report exported as ${format.toUpperCase()} successfully!`, 'success');
+        }
+
+        // GenAI Contract Generation Functions
+        function openGenAIContractModal() {
+            document.getElementById('genAIContractModal').style.display = 'block';
+            // Reset form and states
+            document.getElementById('genAIContractForm').reset();
+            document.getElementById('genAIProgress').style.display = 'none';
+            document.getElementById('genAIResult').style.display = 'none';
+            document.getElementById('generateContractBtn').style.display = 'inline-block';
+            document.getElementById('saveGeneratedContractBtn').style.display = 'none';
+            document.getElementById('downloadContractBtn').style.display = 'none';
+        }
+
+        let generatedContractData = null;
+
+        function generateAIContract() {
+            const form = document.getElementById('genAIContractForm');
+            const formData = new FormData(form);
+            
+            // Validate form
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Get selected clauses
+            const selectedClauses = Array.from(form.querySelectorAll('input[name="clauses"]:checked'))
+                .map(cb => cb.value);
+
+            // Show progress
+            document.getElementById('genAIContractForm').style.display = 'none';
+            document.getElementById('genAIProgress').style.display = 'block';
+            document.getElementById('generateContractBtn').style.display = 'none';
+
+            // Simulate AI contract generation
+            setTimeout(() => {
+                const contractData = {
+                    contractType: formData.get('contractType'),
+                    duration: formData.get('duration'),
+                    partyA: formData.get('partyA'),
+                    partyB: formData.get('partyB'),
+                    contractValue: formData.get('contractValue'),
+                    paymentTerms: formData.get('paymentTerms'),
+                    governingLaw: formData.get('governingLaw'),
+                    currency: formData.get('currency'),
+                    specialRequirements: formData.get('specialRequirements'),
+                    clauses: selectedClauses
+                };
+
+                const generatedContract = generateContractContent(contractData);
+                
+                document.getElementById('contractPreview').innerHTML = generatedContract;
+                document.getElementById('genAIProgress').style.display = 'none';
+                document.getElementById('genAIResult').style.display = 'block';
+                document.getElementById('saveGeneratedContractBtn').style.display = 'inline-block';
+                document.getElementById('downloadContractBtn').style.display = 'inline-block';
+
+                generatedContractData = {
+                    ...contractData,
+                    content: generatedContract,
+                    generatedDate: new Date().toISOString()
+                };
+
+                showNotification('Contract generated successfully with AI!', 'success');
+            }, 3000);
+        }
+
+        function generateContractContent(data) {
+            const currentDate = new Date().toLocaleDateString('en-GB');
+            const contractValue = formatCurrency(data.contractValue);
+            
+            return `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #2c3e50; margin-bottom: 10px;">${data.contractType}</h2>
+                    <p style="color: #7f8c8d;">Contract No: CLM-${Date.now()}</p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">PARTIES</h3>
+                    <p><strong>Party A:</strong> ${data.partyA}<br>
+                    <strong>Party B:</strong> ${data.partyB}</p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">CONTRACT TERMS</h3>
+                    <p><strong>Contract Value:</strong> ${contractValue}<br>
+                    <strong>Duration:</strong> ${data.duration}<br>
+                    <strong>Payment Terms:</strong> ${data.paymentTerms}<br>
+                    <strong>Currency:</strong> ${data.currency}<br>
+                    <strong>Governing Law:</strong> ${data.governingLaw}</p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">1. SCOPE OF WORK</h3>
+                    <p>This ${data.contractType} establishes the terms and conditions under which ${data.partyB} will provide services to ${data.partyA}. The services shall be performed in accordance with the highest professional standards and industry best practices.</p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">2. PAYMENT TERMS</h3>
+                    <p>The total contract value is ${contractValue}. Payment shall be made according to ${data.paymentTerms} terms. All payments shall be made in ${data.currency} and are subject to applicable taxes and regulations of ${data.governingLaw}.</p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">3. DURATION AND TERMINATION</h3>
+                    <p>This agreement shall remain in effect for ${data.duration} from the effective date. Either party may terminate this agreement with thirty (30) days written notice.</p>
+                </div>
+
+                ${data.clauses.includes('confidentiality') ? `
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">4. CONFIDENTIALITY</h3>
+                    <p>Both parties acknowledge that they may have access to confidential information. Each party agrees to maintain the confidentiality of such information and not to disclose it to third parties without prior written consent.</p>
+                </div>` : ''}
+
+                ${data.clauses.includes('liability') ? `
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">5. LIMITATION OF LIABILITY</h3>
+                    <p>In no event shall either party be liable for any indirect, incidental, special, or consequential damages arising out of or in connection with this agreement, regardless of the theory of liability.</p>
+                </div>` : ''}
+
+                ${data.clauses.includes('intellectual_property') ? `
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">6. INTELLECTUAL PROPERTY</h3>
+                    <p>All intellectual property rights in any work product created under this agreement shall be owned by ${data.partyA}, unless otherwise specified in writing.</p>
+                </div>` : ''}
+
+                ${data.clauses.includes('force_majeure') ? `
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">7. FORCE MAJEURE</h3>
+                    <p>Neither party shall be liable for any failure or delay in performance due to circumstances beyond their reasonable control, including but not limited to acts of God, war, terrorism, or government regulations.</p>
+                </div>` : ''}
+
+                ${data.clauses.includes('dispute_resolution') ? `
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">8. DISPUTE RESOLUTION</h3>
+                    <p>Any disputes arising under this agreement shall be resolved through binding arbitration in accordance with the laws of ${data.governingLaw}.</p>
+                </div>` : ''}
+
+                ${data.specialRequirements ? `
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">9. SPECIAL PROVISIONS</h3>
+                    <p>${data.specialRequirements}</p>
+                </div>` : ''}
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px;">GOVERNING LAW</h3>
+                    <p>This agreement shall be governed by and construed in accordance with the laws of ${data.governingLaw}.</p>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <p><strong>${data.partyA}</strong></p>
+                            <br><br>
+                            <p>_________________________</p>
+                            <p>Signature & Date</p>
+                        </div>
+                        <div>
+                            <p><strong>${data.partyB}</strong></p>
+                            <br><br>
+                            <p>_________________________</p>
+                            <p>Signature & Date</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; text-align: center; color: #7f8c8d; font-size: 12px;">
+                    <p>Generated by RuyaTracker CLM Enterprise on ${currentDate}</p>
+                </div>
+            `;
+        }
+
+        function saveGeneratedContract() {
+            if (!generatedContractData) {
+                showNotification('No contract data to save', 'error');
+                return;
+            }
+
+            // Create new contract from generated data
+            const newContract = {
+                id: Date.now(),
+                title: `${generatedContractData.contractType} - ${generatedContractData.partyB}`,
+                vendor: generatedContractData.partyB,
+                value: parseFloat(generatedContractData.contractValue),
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0], // 1 year from now
+                status: 'Draft',
+                type: generatedContractData.contractType,
+                description: `AI-generated ${generatedContractData.contractType} for ${generatedContractData.partyB}`,
+                document: `AI_Contract_${Date.now()}.pdf`,
+                generatedContent: generatedContractData.content,
+                createdBy: currentUser.name,
+                createdDate: new Date().toISOString()
+            };
+
+            contracts.push(newContract);
+            localStorage.setItem('clm_contracts', JSON.stringify(contracts));
+            
+            // Add activity
+            addActivity('contract', `AI-generated contract created: ${newContract.title}`, currentUser.name);
+            
+            // Refresh contracts table
+            loadContractsData();
+            
+            // Close modal
+            closeModal('genAIContractModal');
+            
+            showNotification('AI-generated contract saved successfully!', 'success');
+        }
+
+        function downloadContract() {
+            if (!generatedContractData) {
+                showNotification('No contract data to download', 'error');
+                return;
+            }
+
+            // Create a simple text version for download
+            const contractText = document.getElementById('contractPreview').innerText;
+            const blob = new Blob([contractText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${generatedContractData.contractType}_${generatedContractData.partyB}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Contract downloaded successfully!', 'success');
+        }
+
+        // OCR Functions
+        function openOCRUploadModal() {
+            document.getElementById('ocrUploadModal').style.display = 'block';
+            // Reset to upload step
+            document.getElementById('ocrUploadStep').style.display = 'block';
+            document.getElementById('ocrProcessingStep').style.display = 'none';
+            document.getElementById('ocrResultsStep').style.display = 'none';
+            document.getElementById('processOCRBtn').style.display = 'inline-block';
+            document.getElementById('createContractFromOCRBtn').style.display = 'none';
+            document.getElementById('downloadOCRResultsBtn').style.display = 'none';
+            
+            // Reset form
+            document.getElementById('ocrFileInput').value = '';
+            document.getElementById('ocrDocumentType').value = '';
+        }
+
+        let ocrResults = null;
+
+        function processOCRDocument() {
+            const fileInput = document.getElementById('ocrFileInput');
+            const documentType = document.getElementById('ocrDocumentType').value;
+            
+            if (!fileInput.files[0]) {
+                showNotification('Please select a document to process', 'error');
+                return;
+            }
+            
+            if (!documentType) {
+                showNotification('Please select document type', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            
+            // Show processing step
+            document.getElementById('ocrUploadStep').style.display = 'none';
+            document.getElementById('ocrProcessingStep').style.display = 'block';
+            document.getElementById('processOCRBtn').style.display = 'none';
+
+            // Simulate OCR processing with realistic steps
+            let step = 0;
+            const steps = [
+                { status: 'Analyzing document structure...', duration: 1000 },
+                { status: 'Extracting text content...', duration: 2000 },
+                { status: 'Recognizing key data fields...', duration: 1500 },
+                { status: 'Performing contract analysis...', duration: 2000 },
+                { status: 'Finalizing results...', duration: 500 }
+            ];
+
+            function processStep() {
+                if (step < steps.length) {
+                    document.getElementById('ocrProcessingStatus').textContent = steps[step].status;
+                    
+                    // Update status indicators
+                    if (step >= 1) document.getElementById('textExtractionStatus').innerHTML = '✅ Complete';
+                    if (step >= 2) document.getElementById('dataRecognitionStatus').innerHTML = '✅ Complete';
+                    if (step >= 3) document.getElementById('contractAnalysisStatus').innerHTML = '✅ Complete';
+                    
+                    setTimeout(() => {
+                        step++;
+                        processStep();
+                    }, steps[step].duration);
+                } else {
+                    // Processing complete, show results
+                    showOCRResults(file, documentType);
+                }
+            }
+
+            processStep();
+        }
+
+        function showOCRResults(file, documentType) {
+            // Generate realistic OCR results
+            const mockResults = generateMockOCRResults(file.name, documentType);
+            ocrResults = mockResults;
+
+            // Populate results
+            document.getElementById('extractedKeyData').innerHTML = mockResults.keyData;
+            document.getElementById('extractedDates').innerHTML = mockResults.dates;
+            document.getElementById('extractedText').innerHTML = mockResults.fullText;
+            document.getElementById('contractAnalysis').innerHTML = mockResults.analysis;
+
+            // Show results step
+            document.getElementById('ocrProcessingStep').style.display = 'none';
+            document.getElementById('ocrResultsStep').style.display = 'block';
+            document.getElementById('createContractFromOCRBtn').style.display = 'inline-block';
+            document.getElementById('downloadOCRResultsBtn').style.display = 'inline-block';
+
+            showNotification('OCR processing completed successfully!', 'success');
+        }
+
+        function generateMockOCRResults(filename, documentType) {
+            const mockData = {
+                contract: {
+                    keyData: `
+                        <div style="margin-bottom: 10px;"><strong>Contract Title:</strong> Software License Agreement</div>
+                        <div style="margin-bottom: 10px;"><strong>Vendor:</strong> Microsoft Corporation</div>
+                        <div style="margin-bottom: 10px;"><strong>Contract Value:</strong> 450,000 SAR</div>
+                        <div style="margin-bottom: 10px;"><strong>Payment Terms:</strong> Net 30 days</div>
+                        <div style="margin-bottom: 10px;"><strong>Governing Law:</strong> Kingdom of Saudi Arabia</div>
+                    `,
+                    dates: `
+                        <div style="margin-bottom: 10px;"><strong>Start Date:</strong> 2024-01-15</div>
+                        <div style="margin-bottom: 10px;"><strong>End Date:</strong> 2025-01-14</div>
+                        <div style="margin-bottom: 10px;"><strong>Renewal Date:</strong> 2024-12-15</div>
+                        <div style="margin-bottom: 10px;"><strong>Payment Due:</strong> 2024-02-14</div>
+                    `,
+                    fullText: `SOFTWARE LICENSE AGREEMENT
+
+This Software License Agreement ("Agreement") is entered into on January 15, 2024, between RuyaTracker Enterprise ("Licensee") and Microsoft Corporation ("Licensor").
+
+1. GRANT OF LICENSE
+Licensor hereby grants to Licensee a non-exclusive, non-transferable license to use the software described in Exhibit A.
+
+2. TERM
+This Agreement shall commence on January 15, 2024, and shall continue for a period of one (1) year, unless terminated earlier in accordance with the terms hereof.
+
+3. PAYMENT
+Licensee agrees to pay Licensor the sum of Four Hundred Fifty Thousand Saudi Riyals (450,000 SAR) for the license granted hereunder. Payment shall be made within thirty (30) days of the invoice date.
+
+4. CONFIDENTIALITY
+Both parties acknowledge that they may have access to confidential information and agree to maintain such information in confidence.
+
+5. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the Kingdom of Saudi Arabia.`,
+                    analysis: `
+                        <div style="margin-bottom: 15px;">
+                            <strong>Contract Type:</strong> Software License Agreement<br>
+                            <strong>Risk Level:</strong> <span style="color: #27ae60;">Low Risk</span><br>
+                            <strong>Compliance Score:</strong> <span style="color: #27ae60;">95%</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Key Findings:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>✅ Standard payment terms (Net 30)</li>
+                                <li>✅ Clear termination clauses</li>
+                                <li>✅ Confidentiality provisions included</li>
+                                <li>⚠️ Consider adding liability limitation clause</li>
+                                <li>⚠️ Renewal terms could be more specific</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Recommendations:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Add automatic renewal clause</li>
+                                <li>Include service level agreements</li>
+                                <li>Specify data protection requirements</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                invoice: {
+                    keyData: `
+                        <div style="margin-bottom: 10px;"><strong>Invoice Number:</strong> INV-2024-001</div>
+                        <div style="margin-bottom: 10px;"><strong>Vendor:</strong> Oracle Systems</div>
+                        <div style="margin-bottom: 10px;"><strong>Amount:</strong> 125,000 SAR</div>
+                        <div style="margin-bottom: 10px;"><strong>Tax Amount:</strong> 18,750 SAR</div>
+                        <div style="margin-bottom: 10px;"><strong>Total Amount:</strong> 143,750 SAR</div>
+                    `,
+                    dates: `
+                        <div style="margin-bottom: 10px;"><strong>Invoice Date:</strong> 2024-01-20</div>
+                        <div style="margin-bottom: 10px;"><strong>Due Date:</strong> 2024-02-19</div>
+                        <div style="margin-bottom: 10px;"><strong>Service Period:</strong> 2024-01-01 to 2024-01-31</div>
+                    `,
+                    fullText: `INVOICE
+
+Invoice Number: INV-2024-001
+Date: January 20, 2024
+
+Bill To:
+RuyaTracker Enterprise
+Riyadh, Saudi Arabia
+
+From:
+Oracle Systems
+Database Services Division
+
+Description: Database Maintenance Services - January 2024
+Amount: 125,000 SAR
+VAT (15%): 18,750 SAR
+Total Amount: 143,750 SAR
+
+Payment Terms: Net 30 days
+Due Date: February 19, 2024`,
+                    analysis: `
+                        <div style="margin-bottom: 15px;">
+                            <strong>Document Type:</strong> Invoice<br>
+                            <strong>Validation Status:</strong> <span style="color: #27ae60;">Valid</span><br>
+                            <strong>Tax Compliance:</strong> <span style="color: #27ae60;">Compliant</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Key Findings:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>✅ VAT calculation correct (15%)</li>
+                                <li>✅ Payment terms clearly stated</li>
+                                <li>✅ Service period specified</li>
+                                <li>✅ All required fields present</li>
+                            </ul>
+                        </div>
+                    `
+                }
+            };
+
+            return mockData[documentType] || mockData.contract;
+        }
+
+        function createContractFromOCR() {
+            if (!ocrResults) {
+                showNotification('No OCR results available', 'error');
+                return;
+            }
+
+            // Extract data from OCR results to create a new contract
+            const contractData = extractContractDataFromOCR(ocrResults);
+            
+            const newContract = {
+                id: Date.now(),
+                title: contractData.title || 'OCR Extracted Contract',
+                vendor: contractData.vendor || 'Unknown Vendor',
+                value: contractData.value || 0,
+                startDate: contractData.startDate || new Date().toISOString().split('T')[0],
+                endDate: contractData.endDate || new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+                status: 'Draft',
+                type: contractData.type || 'General Agreement',
+                description: 'Contract created from OCR document processing',
+                document: `OCR_${Date.now()}.pdf`,
+                ocrData: ocrResults,
+                createdBy: currentUser.name,
+                createdDate: new Date().toISOString()
+            };
+
+            contracts.push(newContract);
+            localStorage.setItem('clm_contracts', JSON.stringify(contracts));
+            
+            // Add activity
+            addActivity('contract', `Contract created from OCR: ${newContract.title}`, currentUser.name);
+            
+            // Refresh contracts table
+            loadContractsData();
+            
+            // Close modal
+            closeModal('ocrUploadModal');
+            
+            showNotification('Contract created successfully from OCR data!', 'success');
+        }
+
+        function extractContractDataFromOCR(ocrResults) {
+            // Parse the OCR results to extract contract data
+            const keyDataText = ocrResults.keyData;
+            const datesText = ocrResults.dates;
+            
+            const data = {};
+            
+            // Extract vendor
+            const vendorMatch = keyDataText.match(/<strong>Vendor:<\/strong>\s*([^<]+)/);
+            if (vendorMatch) data.vendor = vendorMatch[1].trim();
+            
+            // Extract value
+            const valueMatch = keyDataText.match(/<strong>Contract Value:<\/strong>\s*([^<]+)/);
+            if (valueMatch) {
+                const valueStr = valueMatch[1].replace(/[^\d]/g, '');
+                data.value = parseInt(valueStr) || 0;
+            }
+            
+            // Extract title
+            const titleMatch = keyDataText.match(/<strong>Contract Title:<\/strong>\s*([^<]+)/);
+            if (titleMatch) data.title = titleMatch[1].trim();
+            
+            // Extract dates
+            const startDateMatch = datesText.match(/<strong>Start Date:<\/strong>\s*([^<]+)/);
+            if (startDateMatch) data.startDate = startDateMatch[1].trim();
+            
+            const endDateMatch = datesText.match(/<strong>End Date:<\/strong>\s*([^<]+)/);
+            if (endDateMatch) data.endDate = endDateMatch[1].trim();
+            
+            return data;
+        }
+
+        function downloadOCRResults() {
+            if (!ocrResults) {
+                showNotification('No OCR results to download', 'error');
+                return;
+            }
+
+            const resultsText = `OCR PROCESSING RESULTS
+Generated: ${new Date().toLocaleString()}
+
+KEY DATA:
+${ocrResults.keyData.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}
+
+IMPORTANT DATES:
+${ocrResults.dates.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}
+
+EXTRACTED TEXT:
+${ocrResults.fullText}
+
+AI ANALYSIS:
+${ocrResults.analysis.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}`;
+
+            const blob = new Blob([resultsText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `OCR_Results_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('OCR results downloaded successfully!', 'success');
         }
 
         // Close modals when clicking outside
