@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>RuyaTracker CLM Enterprise - Clean Version</title>
+    <title>RuyaTracker CLM Enterprise</title>
     <style>
         * {
             margin: 0;
@@ -2401,24 +2397,6 @@
 
         // Initialize Application
         document.addEventListener('DOMContentLoaded', function() {
-            // Explicitly block any external tracking scripts
-            if (window.mixpanel) delete window.mixpanel;
-            if (window.gtag) delete window.gtag;
-            if (window.ga) delete window.ga;
-            if (window.fbq) delete window.fbq;
-            
-            // Block external script loading
-            const originalAppendChild = Node.prototype.appendChild;
-            Node.prototype.appendChild = function(child) {
-                if (child.tagName === 'SCRIPT' && child.src && 
-                    (child.src.includes('mixpanel') || child.src.includes('google-analytics') || 
-                     child.src.includes('facebook') || child.src.includes('tracking'))) {
-                    console.log('Blocked external tracking script:', child.src);
-                    return child;
-                }
-                return originalAppendChild.call(this, child);
-            };
-            
             // Check for existing session
             const savedSession = localStorage.getItem('clm_session');
             if (savedSession) {
@@ -2447,11 +2425,6 @@
         function handleLogin(e) {
             e.preventDefault();
             
-            // Explicitly prevent any external tracking
-            if (window.mixpanel) delete window.mixpanel;
-            if (window.gtag) delete window.gtag;
-            if (window.ga) delete window.ga;
-            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
@@ -2463,9 +2436,6 @@
                 
                 // Save session
                 localStorage.setItem('clm_session', JSON.stringify(currentUser));
-                
-                // Add login activity
-                addActivity('login', `User logged in: ${currentUserRole.name}`, currentUserRole.name);
                 
                 showApp();
                 showNotification('Welcome to RuyaTracker CLM Enterprise!', 'success');
@@ -4722,6 +4692,7 @@
                     ` : ''}
                 </div>
             `;
+        }
         }
 
         function exportReport(format) {
