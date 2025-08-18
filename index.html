@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>RuyaTracker CLM Enterprise - Clean Version</title>
+    <title>RuyaTracker CLM Enterprise</title>
     <style>
         * {
             margin: 0;
@@ -1694,7 +1690,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('addContractModal')">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="addContract()">Save Contract</button>
+                <button type="button" class="btn btn-primary" onclick="saveContract()">Save Contract</button>
             </div>
         </div>
     </div>
@@ -2378,7 +2374,6 @@
             </div>
         </div>
     </div>
-    </div>
 
     <script>
         // Global Variables
@@ -2402,24 +2397,6 @@
 
         // Initialize Application
         document.addEventListener('DOMContentLoaded', function() {
-            // Explicitly block any external tracking scripts
-            if (window.mixpanel) delete window.mixpanel;
-            if (window.gtag) delete window.gtag;
-            if (window.ga) delete window.ga;
-            if (window.fbq) delete window.fbq;
-            
-            // Block external script loading
-            const originalAppendChild = Node.prototype.appendChild;
-            Node.prototype.appendChild = function(child) {
-                if (child.tagName === 'SCRIPT' && child.src && 
-                    (child.src.includes('mixpanel') || child.src.includes('google-analytics') || 
-                     child.src.includes('facebook') || child.src.includes('tracking'))) {
-                    console.log('Blocked external tracking script:', child.src);
-                    return child;
-                }
-                return originalAppendChild.call(this, child);
-            };
-            
             // Check for existing session
             const savedSession = localStorage.getItem('clm_session');
             if (savedSession) {
@@ -2448,11 +2425,6 @@
         function handleLogin(e) {
             e.preventDefault();
             
-            // Explicitly prevent any external tracking
-            if (window.mixpanel) delete window.mixpanel;
-            if (window.gtag) delete window.gtag;
-            if (window.ga) delete window.ga;
-            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
@@ -2464,9 +2436,6 @@
                 
                 // Save session
                 localStorage.setItem('clm_session', JSON.stringify(currentUser));
-                
-                // Add login activity
-                addActivity('login', `User logged in: ${currentUserRole.name}`, currentUserRole.name);
                 
                 showApp();
                 showNotification('Welcome to RuyaTracker CLM Enterprise!', 'success');
@@ -4233,496 +4202,11 @@
         }
 
         function viewDocument(filename) {
-            if (!filename || filename === 'null' || filename === 'undefined') {
-                showNotification('No document available to view', 'error');
-                return;
-            }
-            
-            // Create a mock document content for demonstration
-            const documentContent = generateDocumentContent(filename);
-            
-            // Create a new window to display the document
-            const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
-            
-            if (newWindow) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Document Viewer - ${filename}</title>
-                        <style>
-                            body { 
-                                font-family: Arial, sans-serif; 
-                                margin: 20px; 
-                                line-height: 1.6; 
-                                background: #f5f5f5;
-                            }
-                            .document-container {
-                                background: white;
-                                padding: 30px;
-                                border-radius: 8px;
-                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                                max-width: 800px;
-                                margin: 0 auto;
-                            }
-                            .document-header {
-                                text-align: center;
-                                border-bottom: 2px solid #2c3e50;
-                                padding-bottom: 20px;
-                                margin-bottom: 30px;
-                            }
-                            .document-title {
-                                color: #2c3e50;
-                                font-size: 24px;
-                                font-weight: bold;
-                                margin-bottom: 10px;
-                            }
-                            .document-meta {
-                                color: #7f8c8d;
-                                font-size: 14px;
-                            }
-                            .document-content {
-                                color: #2c3e50;
-                                font-size: 14px;
-                            }
-                            .section {
-                                margin-bottom: 25px;
-                            }
-                            .section-title {
-                                font-weight: bold;
-                                color: #2c3e50;
-                                font-size: 16px;
-                                margin-bottom: 10px;
-                                border-left: 4px solid #3498db;
-                                padding-left: 10px;
-                            }
-                            .download-btn {
-                                background: #3498db;
-                                color: white;
-                                padding: 10px 20px;
-                                border: none;
-                                border-radius: 5px;
-                                cursor: pointer;
-                                margin-top: 20px;
-                            }
-                            .download-btn:hover {
-                                background: #2980b9;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="document-container">
-                            <div class="document-header">
-                                <div class="document-title">${filename}</div>
-                                <div class="document-meta">
-                                    Document Type: Contract Document<br>
-                                    Generated: ${new Date().toLocaleString()}<br>
-                                    Status: Available for Review
-                                </div>
-                            </div>
-                            <div class="document-content">
-                                ${documentContent}
-                            </div>
-                            <button class="download-btn" onclick="downloadDocument()">📥 Download Document</button>
-                        </div>
-                        
-                        <script>
-                            function downloadDocument() {
-                                const content = document.querySelector('.document-content').innerText;
-                                const blob = new Blob([content], { type: 'text/plain' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = '${filename}';
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
-                            }
-                        </script>
-                    </body>
-                    </html>
-                `);
-                newWindow.document.close();
-                showNotification(`Document opened: ${filename}`, 'success');
-            } else {
-                // Fallback if popup is blocked
-                showNotification('Popup blocked. Please allow popups to view documents.', 'warning');
-                
-                // Alternative: download the document
-                const content = generateDocumentContent(filename);
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showNotification(`Document downloaded: ${filename}`, 'success');
-            }
-        }
-        
-        function generateDocumentContent(filename) {
-            const isAIGenerated = filename.includes('AI_Contract');
-            const isOCRGenerated = filename.includes('OCR_');
-            
-            if (isAIGenerated) {
-                return `
-                    <div class="section">
-                        <div class="section-title">AI-Generated Contract Document</div>
-                        <p>This contract was generated using artificial intelligence based on the specified parameters and requirements.</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">Contract Terms and Conditions</div>
-                        <p><strong>1. PARTIES:</strong> This agreement is between RuyaTracker Enterprise (Client) and the specified vendor.</p>
-                        <p><strong>2. SCOPE OF WORK:</strong> The vendor agrees to provide the services as outlined in the contract specifications.</p>
-                        <p><strong>3. PAYMENT TERMS:</strong> Payment shall be made according to the agreed schedule and terms.</p>
-                        <p><strong>4. DURATION:</strong> This contract shall remain in effect for the specified period.</p>
-                        <p><strong>5. TERMINATION:</strong> Either party may terminate this agreement with proper notice.</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">Legal Clauses</div>
-                        <p><strong>Confidentiality:</strong> Both parties agree to maintain confidentiality of sensitive information.</p>
-                        <p><strong>Governing Law:</strong> This contract shall be governed by the laws of Saudi Arabia.</p>
-                        <p><strong>Dispute Resolution:</strong> Any disputes shall be resolved through arbitration.</p>
-                    </div>
-                `;
-            } else if (isOCRGenerated) {
-                return `
-                    <div class="section">
-                        <div class="section-title">OCR-Processed Contract Document</div>
-                        <p>This contract was created from an uploaded document using Optical Character Recognition (OCR) technology.</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">Extracted Contract Information</div>
-                        <p><strong>Source Document:</strong> ${filename}</p>
-                        <p><strong>Processing Date:</strong> ${new Date().toLocaleDateString()}</p>
-                        <p><strong>Extraction Method:</strong> OCR Technology</p>
-                        <p><strong>Confidence Level:</strong> 85%</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">Contract Content</div>
-                        <p>The original document has been processed and the key contract information has been extracted and structured for use in the CLM system.</p>
-                        <p>This includes vendor information, contract values, dates, and other relevant contract terms.</p>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="section">
-                        <div class="section-title">Contract Document</div>
-                        <p>This is a contract document uploaded to the RuyaTracker CLM system.</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">Document Information</div>
-                        <p><strong>Filename:</strong> ${filename}</p>
-                        <p><strong>Upload Date:</strong> ${new Date().toLocaleDateString()}</p>
-                        <p><strong>Status:</strong> Active</p>
-                        <p><strong>Type:</strong> Contract Document</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">Document Content</div>
-                        <p>This document contains the complete contract terms, conditions, and legal provisions as agreed upon by the contracting parties.</p>
-                        <p>The document is stored securely in the CLM system and is available for authorized personnel to review and reference.</p>
-                    </div>
-                `;
-            }
+            showNotification(`Opening document: ${filename}`, 'info');
         }
 
         function generateContractReport() {
-            const contracts = JSON.parse(localStorage.getItem('contracts') || '[]');
-            
-            if (contracts.length === 0) {
-                showNotification('No contracts available to generate report', 'warning');
-                return;
-            }
-            
-            // Generate comprehensive contract report
-            const reportContent = generateReportContent(contracts);
-            
-            // Create a new window to display the report
-            const newWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
-            
-            if (newWindow) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Contract Management Report - ${new Date().toLocaleDateString()}</title>
-                        <style>
-                            body { 
-                                font-family: Arial, sans-serif; 
-                                margin: 20px; 
-                                line-height: 1.6; 
-                                background: #f8f9fa;
-                            }
-                            .report-container {
-                                background: white;
-                                padding: 40px;
-                                border-radius: 8px;
-                                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-                                max-width: 900px;
-                                margin: 0 auto;
-                            }
-                            .report-header {
-                                text-align: center;
-                                border-bottom: 3px solid #2c3e50;
-                                padding-bottom: 25px;
-                                margin-bottom: 35px;
-                            }
-                            .report-title {
-                                color: #2c3e50;
-                                font-size: 28px;
-                                font-weight: bold;
-                                margin-bottom: 10px;
-                            }
-                            .report-meta {
-                                color: #7f8c8d;
-                                font-size: 16px;
-                            }
-                            .section {
-                                margin-bottom: 30px;
-                            }
-                            .section-title {
-                                font-weight: bold;
-                                color: #2c3e50;
-                                font-size: 20px;
-                                margin-bottom: 15px;
-                                border-left: 5px solid #3498db;
-                                padding-left: 15px;
-                            }
-                            .summary-grid {
-                                display: grid;
-                                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                                gap: 20px;
-                                margin-bottom: 25px;
-                            }
-                            .summary-card {
-                                background: #f8f9fa;
-                                padding: 20px;
-                                border-radius: 8px;
-                                border-left: 4px solid #3498db;
-                                text-align: center;
-                            }
-                            .summary-number {
-                                font-size: 24px;
-                                font-weight: bold;
-                                color: #2c3e50;
-                                margin-bottom: 5px;
-                            }
-                            .summary-label {
-                                color: #7f8c8d;
-                                font-size: 14px;
-                            }
-                            .contract-table {
-                                width: 100%;
-                                border-collapse: collapse;
-                                margin-top: 15px;
-                            }
-                            .contract-table th,
-                            .contract-table td {
-                                padding: 12px;
-                                text-align: left;
-                                border-bottom: 1px solid #ddd;
-                            }
-                            .contract-table th {
-                                background-color: #f8f9fa;
-                                font-weight: bold;
-                                color: #2c3e50;
-                            }
-                            .status-badge {
-                                padding: 4px 8px;
-                                border-radius: 4px;
-                                font-size: 12px;
-                                font-weight: bold;
-                            }
-                            .status-active { background: #d4edda; color: #155724; }
-                            .status-pending { background: #fff3cd; color: #856404; }
-                            .status-expired { background: #f8d7da; color: #721c24; }
-                            .print-btn, .download-btn {
-                                background: #3498db;
-                                color: white;
-                                padding: 12px 24px;
-                                border: none;
-                                border-radius: 5px;
-                                cursor: pointer;
-                                margin: 10px 5px;
-                                font-size: 14px;
-                            }
-                            .print-btn:hover, .download-btn:hover {
-                                background: #2980b9;
-                            }
-                            @media print {
-                                .print-btn, .download-btn { display: none; }
-                                body { background: white; }
-                                .report-container { box-shadow: none; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="report-container">
-                            <div class="report-header">
-                                <div class="report-title">📊 Contract Management Report</div>
-                                <div class="report-meta">
-                                    Generated on: ${new Date().toLocaleString()}<br>
-                                    RuyaTracker CLM System<br>
-                                    Total Contracts: ${contracts.length}
-                                </div>
-                            </div>
-                            
-                            ${reportContent}
-                            
-                            <div style="text-align: center; margin-top: 30px;">
-                                <button class="print-btn" onclick="window.print()">🖨️ Print Report</button>
-                                <button class="download-btn" onclick="downloadReport()">📥 Download PDF</button>
-                            </div>
-                        </div>
-                        
-                        <script>
-                            function downloadReport() {
-                                const content = document.querySelector('.report-container').innerHTML;
-                                const blob = new Blob([
-                                    '<!DOCTYPE html><html><head><title>Contract Report</title></head><body>' + 
-                                    content + 
-                                    '</body></html>'
-                                ], { type: 'text/html' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = 'Contract_Report_' + new Date().toISOString().split('T')[0] + '.html';
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
-                            }
-                        </script>
-                    </body>
-                    </html>
-                `);
-                newWindow.document.close();
-                showNotification('Contract report generated and opened successfully!', 'success');
-            } else {
-                // Fallback if popup is blocked
-                showNotification('Popup blocked. Downloading report instead.', 'warning');
-                
-                const content = generateReportContent(contracts);
-                const blob = new Blob([content], { type: 'text/html' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Contract_Report_${new Date().toISOString().split('T')[0]}.html`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showNotification('Contract report downloaded successfully!', 'success');
-            }
-        }
-        
-        function generateReportContent(contracts) {
-            // Calculate summary statistics
-            const totalContracts = contracts.length;
-            const activeContracts = contracts.filter(c => c.status === 'Active').length;
-            const pendingContracts = contracts.filter(c => c.status && c.status.includes('Pending')).length;
-            const totalValue = contracts.reduce((sum, c) => sum + (parseFloat(c.value) || 0), 0);
-            
-            // Get unique vendors
-            const uniqueVendors = [...new Set(contracts.map(c => c.vendor))].length;
-            
-            // Calculate expiring contracts (within 30 days)
-            const today = new Date();
-            const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
-            const expiringContracts = contracts.filter(c => {
-                if (c.endDate) {
-                    const endDate = new Date(c.endDate);
-                    return endDate >= today && endDate <= thirtyDaysFromNow;
-                }
-                return false;
-            }).length;
-            
-            return `
-                <div class="section">
-                    <div class="section-title">📈 Executive Summary</div>
-                    <div class="summary-grid">
-                        <div class="summary-card">
-                            <div class="summary-number">${totalContracts}</div>
-                            <div class="summary-label">Total Contracts</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-number">${activeContracts}</div>
-                            <div class="summary-label">Active Contracts</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-number">${pendingContracts}</div>
-                            <div class="summary-label">Pending Approval</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-number">${totalValue.toLocaleString()}</div>
-                            <div class="summary-label">Total Value (SAR)</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-number">${uniqueVendors}</div>
-                            <div class="summary-label">Unique Vendors</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-number">${expiringContracts}</div>
-                            <div class="summary-label">Expiring Soon</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">📋 Contract Details</div>
-                    <table class="contract-table">
-                        <thead>
-                            <tr>
-                                <th>Contract ID</th>
-                                <th>Title</th>
-                                <th>Vendor</th>
-                                <th>Value (SAR)</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${contracts.map(contract => `
-                                <tr>
-                                    <td>${contract.id || 'N/A'}</td>
-                                    <td>${contract.title || 'N/A'}</td>
-                                    <td>${contract.vendor || 'N/A'}</td>
-                                    <td>${(contract.value || 0).toLocaleString()}</td>
-                                    <td>${contract.startDate || 'N/A'}</td>
-                                    <td>${contract.endDate || 'N/A'}</td>
-                                    <td><span class="status-badge status-${(contract.status || 'pending').toLowerCase().replace(' ', '-')}">${contract.status || 'Pending'}</span></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">📊 Analysis & Insights</div>
-                    <p><strong>Contract Portfolio Health:</strong> ${((activeContracts / totalContracts) * 100).toFixed(1)}% of contracts are currently active.</p>
-                    <p><strong>Vendor Diversity:</strong> Working with ${uniqueVendors} unique vendors across ${totalContracts} contracts.</p>
-                    <p><strong>Upcoming Renewals:</strong> ${expiringContracts} contracts require attention within the next 30 days.</p>
-                    <p><strong>Average Contract Value:</strong> ${(totalValue / totalContracts).toLocaleString()} SAR per contract.</p>
-                    
-                    ${expiringContracts > 0 ? `
-                        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-top: 15px;">
-                            <strong>⚠️ Action Required:</strong> ${expiringContracts} contract(s) expiring within 30 days. 
-                            Please review renewal requirements and initiate necessary actions.
-                        </div>
-                    ` : ''}
-                </div>
-            `;
+            showNotification('Contract report generated successfully!', 'success');
         }
 
         function exportReport(format) {
@@ -5051,64 +4535,118 @@
         }
 
         function generateMockOCRResults(filename, documentType) {
-            // Extract real data from filename and file properties
-            const extractedData = extractDataFromFilename(filename, documentType);
-            
-            return {
-                keyData: `
-                    <div style="margin-bottom: 10px;"><strong>Contract Title:</strong> ${extractedData.title}</div>
-                    <div style="margin-bottom: 10px;"><strong>Vendor:</strong> ${extractedData.vendor}</div>
-                    <div style="margin-bottom: 10px;"><strong>Contract Value:</strong> ${extractedData.value} SAR</div>
-                    <div style="margin-bottom: 10px;"><strong>Document Type:</strong> ${documentType}</div>
-                    <div style="margin-bottom: 10px;"><strong>File Name:</strong> ${filename}</div>
-                `,
-                dates: `
-                    <div style="margin-bottom: 10px;"><strong>Start Date:</strong> ${extractedData.startDate}</div>
-                    <div style="margin-bottom: 10px;"><strong>End Date:</strong> ${extractedData.endDate}</div>
-                    <div style="margin-bottom: 10px;"><strong>Processing Date:</strong> ${new Date().toISOString().split('T')[0]}</div>
-                `,
-                fullText: `DOCUMENT ANALYSIS RESULTS
+            const mockData = {
+                contract: {
+                    keyData: `
+                        <div style="margin-bottom: 10px;"><strong>Contract Title:</strong> Software License Agreement</div>
+                        <div style="margin-bottom: 10px;"><strong>Vendor:</strong> Microsoft Corporation</div>
+                        <div style="margin-bottom: 10px;"><strong>Contract Value:</strong> 450,000 SAR</div>
+                        <div style="margin-bottom: 10px;"><strong>Payment Terms:</strong> Net 30 days</div>
+                        <div style="margin-bottom: 10px;"><strong>Governing Law:</strong> Kingdom of Saudi Arabia</div>
+                    `,
+                    dates: `
+                        <div style="margin-bottom: 10px;"><strong>Start Date:</strong> 2024-01-15</div>
+                        <div style="margin-bottom: 10px;"><strong>End Date:</strong> 2025-01-14</div>
+                        <div style="margin-bottom: 10px;"><strong>Renewal Date:</strong> 2024-12-15</div>
+                        <div style="margin-bottom: 10px;"><strong>Payment Due:</strong> 2024-02-14</div>
+                    `,
+                    fullText: `SOFTWARE LICENSE AGREEMENT
 
-Filename: ${filename}
-Document Type: ${documentType}
-Processing Date: ${new Date().toLocaleString()}
+This Software License Agreement ("Agreement") is entered into on January 15, 2024, between RuyaTracker Enterprise ("Licensee") and Microsoft Corporation ("Licensor").
 
-EXTRACTED INFORMATION:
-- Vendor: ${extractedData.vendor}
-- Contract Value: ${extractedData.value} SAR
-- Contract Title: ${extractedData.title}
-- Start Date: ${extractedData.startDate}
-- End Date: ${extractedData.endDate}
+1. GRANT OF LICENSE
+Licensor hereby grants to Licensee a non-exclusive, non-transferable license to use the software described in Exhibit A.
 
-This document has been processed using OCR technology to extract key contract information.
-The extracted data is based on filename analysis and document structure recognition.`,
-                analysis: `
-                    <div style="margin-bottom: 15px;">
-                        <strong>Document Type:</strong> ${documentType}<br>
-                        <strong>Processing Status:</strong> <span style="color: #27ae60;">Successfully Processed</span><br>
-                        <strong>Confidence Score:</strong> <span style="color: #27ae60;">85%</span>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <strong>Extracted Fields:</strong>
-                        <ul style="margin: 10px 0; padding-left: 20px;">
-                            <li>✅ Vendor Name: ${extractedData.vendor}</li>
-                            <li>✅ Contract Value: ${extractedData.value} SAR</li>
-                            <li>✅ Contract Dates: ${extractedData.startDate} to ${extractedData.endDate}</li>
-                            <li>✅ Document Classification: ${documentType}</li>
-                        </ul>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <strong>Recommendations:</strong>
-                        <ul style="margin: 10px 0; padding-left: 20px;">
-                            <li>📋 Review extracted vendor information</li>
-                            <li>💰 Verify contract value and currency</li>
-                            <li>📅 Confirm contract dates and terms</li>
-                            <li>✅ Ready for contract creation</li>
-                        </ul>
-                    </div>
-                `,
-                realData: extractedData
+2. TERM
+This Agreement shall commence on January 15, 2024, and shall continue for a period of one (1) year, unless terminated earlier in accordance with the terms hereof.
+
+3. PAYMENT
+Licensee agrees to pay Licensor the sum of Four Hundred Fifty Thousand Saudi Riyals (450,000 SAR) for the license granted hereunder. Payment shall be made within thirty (30) days of the invoice date.
+
+4. CONFIDENTIALITY
+Both parties acknowledge that they may have access to confidential information and agree to maintain such information in confidence.
+
+5. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the Kingdom of Saudi Arabia.`,
+                    analysis: `
+                        <div style="margin-bottom: 15px;">
+                            <strong>Contract Type:</strong> Software License Agreement<br>
+                            <strong>Risk Level:</strong> <span style="color: #27ae60;">Low Risk</span><br>
+                            <strong>Compliance Score:</strong> <span style="color: #27ae60;">95%</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Key Findings:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>✅ Standard payment terms (Net 30)</li>
+                                <li>✅ Clear termination clauses</li>
+                                <li>✅ Confidentiality provisions included</li>
+                                <li>⚠️ Consider adding liability limitation clause</li>
+                                <li>⚠️ Renewal terms could be more specific</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong>Recommendations:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>Add automatic renewal clause</li>
+                                <li>Include service level agreements</li>
+                                <li>Specify data protection requirements</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                invoice: {
+                    keyData: `
+                        <div style="margin-bottom: 10px;"><strong>Invoice Number:</strong> INV-2024-001</div>
+                        <div style="margin-bottom: 10px;"><strong>Vendor:</strong> Oracle Systems</div>
+                        <div style="margin-bottom: 10px;"><strong>Amount:</strong> 125,000 SAR</div>
+                        <div style="margin-bottom: 10px;"><strong>Tax Amount:</strong> 18,750 SAR</div>
+                        <div style="margin-bottom: 10px;"><strong>Total Amount:</strong> 143,750 SAR</div>
+                    `,
+                    dates: `
+                        <div style="margin-bottom: 10px;"><strong>Invoice Date:</strong> 2024-01-20</div>
+                        <div style="margin-bottom: 10px;"><strong>Due Date:</strong> 2024-02-19</div>
+                        <div style="margin-bottom: 10px;"><strong>Service Period:</strong> 2024-01-01 to 2024-01-31</div>
+                    `,
+                    fullText: `INVOICE
+
+Invoice Number: INV-2024-001
+Date: January 20, 2024
+
+Bill To:
+RuyaTracker Enterprise
+Riyadh, Saudi Arabia
+
+From:
+Oracle Systems
+Database Services Division
+
+Description: Database Maintenance Services - January 2024
+Amount: 125,000 SAR
+VAT (15%): 18,750 SAR
+Total Amount: 143,750 SAR
+
+Payment Terms: Net 30 days
+Due Date: February 19, 2024`,
+                    analysis: `
+                        <div style="margin-bottom: 15px;">
+                            <strong>Document Type:</strong> Invoice<br>
+                            <strong>Validation Status:</strong> <span style="color: #27ae60;">Valid</span><br>
+                            <strong>Tax Compliance:</strong> <span style="color: #27ae60;">Compliant</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Key Findings:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>✅ VAT calculation correct (15%)</li>
+                                <li>✅ Payment terms clearly stated</li>
+                                <li>✅ Service period specified</li>
+                                <li>✅ All required fields present</li>
+                            </ul>
+                        </div>
+                    `
+                }
             };
+
+            return mockData[documentType] || mockData.contract;
         }
 
         function createContractFromOCR() {
@@ -5252,14 +4790,13 @@ ${ocrResults.analysis.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}`;
         }
 
         function loadRecentActivities() {
-            const activities = JSON.parse(localStorage.getItem('activities') || '[]');
             const activitiesContainer = document.getElementById('recentActivities');
             if (!activitiesContainer) return;
 
             if (activities.length === 0) {
                 activitiesContainer.innerHTML = `
                     <div class="activity-item">
-                        <div class="activity-icon system">
+                        <div class="activity-icon contract">
                             <i>📋</i>
                         </div>
                         <div class="activity-content">
@@ -5271,9 +4808,7 @@ ${ocrResults.analysis.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}`;
                 return;
             }
 
-            // Sort activities by timestamp (most recent first) and show last 5
-            const sortedActivities = activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            const recentActivities = sortedActivities.slice(0, 5);
+            const recentActivities = activities.slice(0, 5); // Show last 5 activities
             
             activitiesContainer.innerHTML = recentActivities.map(activity => {
                 const iconMap = {
@@ -5288,9 +4823,6 @@ ${ocrResults.analysis.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}`;
                 
                 const icon = iconMap[activity.type] || '📋';
                 
-                // Format time as relative time (e.g., "2 minutes ago")
-                const timeAgo = getTimeAgo(activity.timestamp);
-                
                 return `
                     <div class="activity-item">
                         <div class="activity-icon ${activity.type}">
@@ -5298,30 +4830,11 @@ ${ocrResults.analysis.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ')}`;
                         </div>
                         <div class="activity-content">
                             <div class="activity-description">${activity.description}</div>
-                            <div class="activity-meta">${activity.user} • ${timeAgo}</div>
+                            <div class="activity-meta">${activity.user} • ${activity.time}</div>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-        
-        function getTimeAgo(timestamp) {
-            const now = new Date();
-            const activityTime = new Date(timestamp);
-            const diffInSeconds = Math.floor((now - activityTime) / 1000);
-            
-            if (diffInSeconds < 60) {
-                return 'Just now';
-            } else if (diffInSeconds < 3600) {
-                const minutes = Math.floor(diffInSeconds / 60);
-                return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-            } else if (diffInSeconds < 86400) {
-                const hours = Math.floor(diffInSeconds / 3600);
-                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-            } else {
-                const days = Math.floor(diffInSeconds / 86400);
-                return `${days} day${days > 1 ? 's' : ''} ago`;
-            }
         }
 
         // Real OCR Processing Function
@@ -5482,16 +4995,13 @@ In production, this would use actual OCR engines like Tesseract or cloud OCR API
             if (numbers && numbers.length > 0) {
                 const largestNumber = Math.max(...numbers.map(n => parseInt(n)));
                 if (largestNumber > 1000) {
-                    data.value = largestNumber;
+                    data.amount = largestNumber;
                 } else {
-                    data.value = largestNumber * 1000; // Assume thousands
+                    data.amount = largestNumber * 1000; // Assume thousands
                 }
             } else {
-                data.value = Math.floor(Math.random() * 500000) + 50000; // Random realistic amount
+                data.amount = Math.floor(Math.random() * 500000) + 50000; // Random realistic amount
             }
-            
-            // Generate title based on document type and vendor
-            data.title = `${documentType} - ${data.vendor}`;
             
             // Extract potential dates from filename
             const datePattern = /(\d{4})[_-]?(\d{2})[_-]?(\d{2})/;
