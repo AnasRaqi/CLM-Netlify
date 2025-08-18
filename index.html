@@ -598,6 +598,14 @@
         }
 
         /* List and Card Views */
+        .vendor-view {
+            display: none;
+        }
+
+        .vendor-view.active {
+            display: block;
+        }
+
         .list-view, .card-view {
             display: none;
         }
@@ -615,6 +623,65 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        /* Workflow Form Styles */
+        .info-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .info-box h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box p {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .approver-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .approver-item select {
+            flex: 1;
+        }
+
+        .approver-item .approval-order {
+            flex: 0 0 100px;
+        }
+
+        .approver-item .btn {
+            flex: 0 0 auto;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
 
         .card-grid {
@@ -2319,29 +2386,96 @@
                 <form id="addWorkflowForm">
                     <div class="form-row">
                         <div class="form-col">
+                            <label>Workflow Template</label>
+                            <select class="form-control" name="template" onchange="handleWorkflowTemplateChange()" required>
+                                <option value="">Select Template</option>
+                                <option value="default_contract_approval">Default: Contract Approval</option>
+                                <option value="default_vendor_addition">Default: Vendor Addition</option>
+                                <option value="default_license_renewal">Default: License Renewal</option>
+                                <option value="default_document_review">Default: Document Review</option>
+                                <option value="default_budget_approval">Default: Budget Approval</option>
+                                <option value="custom">Custom Workflow</option>
+                            </select>
+                        </div>
+                        <div class="form-col">
                             <label>Workflow Name</label>
                             <input type="text" class="form-control" name="name" required>
                         </div>
+                    </div>
+                    
+                    <!-- Custom Workflow Type Selection (shown only for custom workflows) -->
+                    <div id="customWorkflowType" class="form-row" style="display: none;">
                         <div class="form-col">
-                            <label>Type</label>
-                            <select class="form-control" name="type" required>
-                                <option value="">Select Type</option>
-                                <option value="Contract Approval">Contract Approval</option>
-                                <option value="Vendor Approval">Vendor Approval</option>
-                                <option value="Document Review">Document Review</option>
-                                <option value="Budget Approval">Budget Approval</option>
+                            <label>Workflow Type</label>
+                            <select class="form-control" name="workflowType">
+                                <option value="contract">Contract Management</option>
+                                <option value="vendor">Vendor Management</option>
+                                <option value="license">License Renewal</option>
+                                <option value="document">Document Review</option>
+                                <option value="budget">Budget Approval</option>
+                                <option value="procurement">Procurement Process</option>
+                                <option value="compliance">Compliance Review</option>
+                                <option value="other">Other</option>
                             </select>
                         </div>
+                        <div class="form-col">
+                            <label>Custom Type (if Other)</label>
+                            <input type="text" class="form-control" name="customType" placeholder="Enter custom type">
+                        </div>
                     </div>
+
+                    <!-- Default Workflow Info (shown for default templates) -->
+                    <div id="defaultWorkflowInfo" class="form-row" style="display: none;">
+                        <div class="form-col">
+                            <div class="info-box">
+                                <h4>Default Workflow Information</h4>
+                                <p id="defaultWorkflowDescription"></p>
+                                <p><strong>Default Approvers:</strong> <span id="defaultApprovers"></span></p>
+                                <p><strong>Estimated Duration:</strong> <span id="defaultDuration"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Approvers Section -->
+                    <div id="customApproversSection" class="form-row" style="display: none;">
+                        <div class="form-col">
+                            <label>Custom Approvers</label>
+                            <div id="approversList">
+                                <div class="approver-item">
+                                    <select class="form-control approver-select" name="approvers[]">
+                                        <option value="">Select Approver</option>
+                                        <option value="admin@ruyatrack.com">Administrator</option>
+                                        <option value="manager@ruyatrack.com">Manager</option>
+                                        <option value="procurement@ruyatrack.com">Procurement Team</option>
+                                        <option value="finance@ruyatrack.com">Finance Team</option>
+                                        <option value="it@ruyatrack.com">IT Team</option>
+                                        <option value="analyst@ruyatrack.com">Business Analyst</option>
+                                    </select>
+                                    <select class="form-control approval-order" name="approvalOrder[]">
+                                        <option value="1">Step 1</option>
+                                        <option value="2">Step 2</option>
+                                        <option value="3">Step 3</option>
+                                        <option value="4">Step 4</option>
+                                        <option value="5">Step 5</option>
+                                    </select>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeApprover(this)">Remove</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addApprover()">Add Another Approver</button>
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-col">
-                            <label>Assigned To</label>
+                            <label>Assigned To (Initial)</label>
                             <select class="form-control" name="assignedTo" required>
                                 <option value="">Select User</option>
                                 <option value="admin@ruyatrack.com">Administrator</option>
                                 <option value="manager@ruyatrack.com">Manager</option>
                                 <option value="procurement@ruyatrack.com">Procurement Team</option>
                                 <option value="finance@ruyatrack.com">Finance Team</option>
+                                <option value="it@ruyatrack.com">IT Team</option>
+                                <option value="analyst@ruyatrack.com">Business Analyst</option>
                             </select>
                         </div>
                         <div class="form-col">
@@ -2358,6 +2492,13 @@
                         <div class="form-col">
                             <label>Due Date</label>
                             <input type="date" class="form-control" name="dueDate" required>
+                        </div>
+                        <div class="form-col">
+                            <label>Auto-Apply to Future Items</label>
+                            <select class="form-control" name="autoApply">
+                                <option value="false">No</option>
+                                <option value="true">Yes</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -3188,13 +3329,26 @@
             document.getElementById('addVendorModal').style.display = 'block';
         }
 
-        function saveVendor() {
+        function generateUniqueVendorId() {
+            let maxId = 0;
+            vendors.forEach(vendor => {
+                if (vendor.vendorId && vendor.vendorId.startsWith('VND-')) {
+                    const idNum = parseInt(vendor.vendorId.split('-')[1]);
+                    if (idNum > maxId) {
+                        maxId = idNum;
+                    }
+                }
+            });
+            return `VND-${String(maxId + 1).padStart(3, '0')}`;
+        }
+
+        function addVendor() {
             const form = document.getElementById('addVendorForm');
             const formData = new FormData(form);
             
             const newVendor = {
-                id: vendors.length + 1,
-                vendorId: `VND-${String(vendors.length + 1).padStart(3, '0')}`,
+                id: Date.now(), // Use timestamp for unique ID
+                vendorId: generateUniqueVendorId(), // Generate unique vendor ID
                 name: formData.get('name'),
                 contact: formData.get('contact'),
                 email: formData.get('email'),
@@ -3204,7 +3358,7 @@
                 rating: parseInt(formData.get('rating')),
                 status: 'Pending',
                 documents: formData.get('documents') ? [formData.get('documents').name] : []
-            };
+            };;
 
             vendors.push(newVendor);
             saveDataToStorage();
@@ -3368,21 +3522,183 @@
             document.getElementById('addWorkflowModal').style.display = 'block';
         }
 
+        // Default workflow templates
+        const defaultWorkflowTemplates = {
+            'default_contract_approval': {
+                name: 'Contract Approval Workflow',
+                type: 'Contract Approval',
+                description: 'Standard workflow for contract approval process including legal review, budget approval, and final sign-off.',
+                approvers: ['procurement@ruyatrack.com', 'finance@ruyatrack.com', 'manager@ruyatrack.com'],
+                duration: '5-7 business days',
+                steps: ['Initial Review', 'Budget Verification', 'Legal Review', 'Final Approval']
+            },
+            'default_vendor_addition': {
+                name: 'Vendor Addition Workflow',
+                type: 'Vendor Approval',
+                description: 'Standard workflow for adding new vendors including due diligence, compliance check, and approval.',
+                approvers: ['procurement@ruyatrack.com', 'admin@ruyatrack.com'],
+                duration: '3-5 business days',
+                steps: ['Vendor Verification', 'Compliance Check', 'Final Approval']
+            },
+            'default_license_renewal': {
+                name: 'License Renewal Workflow',
+                type: 'License Renewal',
+                description: 'Standard workflow for software license renewals including budget approval and procurement.',
+                approvers: ['it@ruyatrack.com', 'finance@ruyatrack.com', 'manager@ruyatrack.com'],
+                duration: '2-4 business days',
+                steps: ['IT Assessment', 'Budget Approval', 'Procurement']
+            },
+            'default_document_review': {
+                name: 'Document Review Workflow',
+                type: 'Document Review',
+                description: 'Standard workflow for document review and approval process.',
+                approvers: ['analyst@ruyatrack.com', 'manager@ruyatrack.com'],
+                duration: '2-3 business days',
+                steps: ['Initial Review', 'Final Approval']
+            },
+            'default_budget_approval': {
+                name: 'Budget Approval Workflow',
+                type: 'Budget Approval',
+                description: 'Standard workflow for budget approval process including financial review and management approval.',
+                approvers: ['finance@ruyatrack.com', 'manager@ruyatrack.com', 'admin@ruyatrack.com'],
+                duration: '3-5 business days',
+                steps: ['Financial Review', 'Management Review', 'Final Approval']
+            }
+        };
+
+        function handleWorkflowTemplateChange() {
+            const templateSelect = document.querySelector('select[name="template"]');
+            const selectedTemplate = templateSelect.value;
+            
+            const customWorkflowType = document.getElementById('customWorkflowType');
+            const defaultWorkflowInfo = document.getElementById('defaultWorkflowInfo');
+            const customApproversSection = document.getElementById('customApproversSection');
+            const nameInput = document.querySelector('input[name="name"]');
+            
+            // Hide all sections first
+            customWorkflowType.style.display = 'none';
+            defaultWorkflowInfo.style.display = 'none';
+            customApproversSection.style.display = 'none';
+            
+            if (selectedTemplate === 'custom') {
+                // Show custom workflow options
+                customWorkflowType.style.display = 'block';
+                customApproversSection.style.display = 'block';
+                nameInput.value = '';
+            } else if (selectedTemplate && defaultWorkflowTemplates[selectedTemplate]) {
+                // Show default workflow info
+                const template = defaultWorkflowTemplates[selectedTemplate];
+                defaultWorkflowInfo.style.display = 'block';
+                
+                // Populate default workflow information
+                document.getElementById('defaultWorkflowDescription').textContent = template.description;
+                document.getElementById('defaultApprovers').textContent = template.approvers.join(', ');
+                document.getElementById('defaultDuration').textContent = template.duration;
+                
+                // Pre-fill the name
+                nameInput.value = template.name;
+            }
+        }
+
+        function addApprover() {
+            const approversList = document.getElementById('approversList');
+            const approverCount = approversList.children.length;
+            
+            const approverItem = document.createElement('div');
+            approverItem.className = 'approver-item';
+            approverItem.innerHTML = `
+                <select class="form-control approver-select" name="approvers[]">
+                    <option value="">Select Approver</option>
+                    <option value="admin@ruyatrack.com">Administrator</option>
+                    <option value="manager@ruyatrack.com">Manager</option>
+                    <option value="procurement@ruyatrack.com">Procurement Team</option>
+                    <option value="finance@ruyatrack.com">Finance Team</option>
+                    <option value="it@ruyatrack.com">IT Team</option>
+                    <option value="analyst@ruyatrack.com">Business Analyst</option>
+                </select>
+                <select class="form-control approval-order" name="approvalOrder[]">
+                    <option value="1">Step 1</option>
+                    <option value="2">Step 2</option>
+                    <option value="3">Step 3</option>
+                    <option value="4">Step 4</option>
+                    <option value="5">Step 5</option>
+                </select>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeApprover(this)">Remove</button>
+            `;
+            
+            // Set default step number
+            const orderSelect = approverItem.querySelector('.approval-order');
+            orderSelect.value = Math.min(approverCount + 1, 5);
+            
+            approversList.appendChild(approverItem);
+        }
+
+        function removeApprover(button) {
+            const approverItem = button.parentElement;
+            approverItem.remove();
+        }
+
         function saveWorkflow() {
             const form = document.getElementById('addWorkflowForm');
             const formData = new FormData(form);
+            const template = formData.get('template');
+            
+            // Collect approvers for custom workflows
+            let approvers = [];
+            let approvalSteps = [];
+            
+            if (template === 'custom') {
+                const approverSelects = form.querySelectorAll('select[name="approvers[]"]');
+                const orderSelects = form.querySelectorAll('select[name="approvalOrder[]"]');
+                
+                approverSelects.forEach((select, index) => {
+                    if (select.value) {
+                        approvers.push({
+                            approver: select.value,
+                            step: parseInt(orderSelects[index].value),
+                            status: 'Pending'
+                        });
+                    }
+                });
+                
+                // Sort approvers by step
+                approvers.sort((a, b) => a.step - b.step);
+                
+                // Create approval steps
+                approvalSteps = approvers.map((approver, index) => `Step ${approver.step}: ${approver.approver}`);
+            } else if (defaultWorkflowTemplates[template]) {
+                // Use default template approvers
+                const templateData = defaultWorkflowTemplates[template];
+                approvers = templateData.approvers.map((approver, index) => ({
+                    approver: approver,
+                    step: index + 1,
+                    status: 'Pending'
+                }));
+                approvalSteps = templateData.steps;
+            }
+            
+            const workflowType = template === 'custom' ? 
+                (formData.get('workflowType') === 'other' ? formData.get('customType') : formData.get('workflowType')) :
+                defaultWorkflowTemplates[template]?.type || 'Standard';
             
             const newWorkflow = {
-                id: workflows.length + 1,
+                id: Date.now(), // Use timestamp for unique ID
                 workflowId: `WF-2024-${String(workflows.length + 1).padStart(3, '0')}`,
                 name: formData.get('name'),
-                type: formData.get('type'),
-                status: 'Pending',
+                template: template,
+                type: workflowType,
+                status: 'Active',
                 assignedTo: formData.get('assignedTo'),
                 createdDate: new Date().toISOString().split('T')[0],
                 dueDate: formData.get('dueDate'),
                 priority: formData.get('priority'),
-                description: formData.get('description')
+                description: formData.get('description'),
+                autoApply: formData.get('autoApply') === 'true',
+                approvers: approvers,
+                approvalSteps: approvalSteps,
+                isCustom: template === 'custom',
+                currentStep: 1,
+                createdBy: currentUser?.name || 'System'
             };
 
             workflows.push(newWorkflow);
@@ -3390,7 +3706,13 @@
             
             closeModal('addWorkflowModal');
             loadWorkflowsData();
-            showNotification('Workflow created successfully!', 'success');
+            showNotification(`${template === 'custom' ? 'Custom' : 'Default'} workflow created successfully!`, 'success');
+            
+            // Reset form
+            form.reset();
+            document.getElementById('customWorkflowType').style.display = 'none';
+            document.getElementById('defaultWorkflowInfo').style.display = 'none';
+            document.getElementById('customApproversSection').style.display = 'none';
         }
 
         function viewWorkflow(id) {
