@@ -625,65 +625,6 @@
             align-items: center;
         }
 
-        /* Workflow Form Styles */
-        .info-box {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 10px 0;
-        }
-
-        .info-box h4 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .info-box p {
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        .approver-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .approver-item select {
-            flex: 1;
-        }
-
-        .approver-item .approval-order {
-            flex: 0 0 100px;
-        }
-
-        .approver-item .btn {
-            flex: 0 0 auto;
-        }
-
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card-item {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -2377,113 +2318,55 @@
 
     <!-- Add Workflow Modal -->
     <div id="addWorkflowModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
                 <h3 class="modal-title">Create New Workflow</h3>
                 <span class="close" onclick="closeModal('addWorkflowModal')">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="addWorkflowForm">
+                    <!-- Workflow Template Selection -->
                     <div class="form-row">
                         <div class="form-col">
                             <label>Workflow Template</label>
-                            <select class="form-control" name="template" onchange="handleWorkflowTemplateChange()" required>
+                            <select class="form-control" id="workflowTemplate" onchange="loadWorkflowTemplate()" required>
                                 <option value="">Select Template</option>
-                                <option value="default_contract_approval">Default: Contract Approval</option>
-                                <option value="default_vendor_addition">Default: Vendor Addition</option>
-                                <option value="default_license_renewal">Default: License Renewal</option>
-                                <option value="default_document_review">Default: Document Review</option>
-                                <option value="default_budget_approval">Default: Budget Approval</option>
+                                <option value="contract_approval">Contract Approval</option>
+                                <option value="vendor_addition">Vendor Addition</option>
+                                <option value="license_renewal">License Renewal</option>
+                                <option value="document_review">Document Review</option>
+                                <option value="budget_approval">Budget Approval</option>
+                                <option value="procurement">Procurement Process</option>
+                                <option value="compliance_check">Compliance Check</option>
                                 <option value="custom">Custom Workflow</option>
                             </select>
                         </div>
                         <div class="form-col">
-                            <label>Workflow Name</label>
-                            <input type="text" class="form-control" name="name" required>
-                        </div>
-                    </div>
-                    
-                    <!-- Custom Workflow Type Selection (shown only for custom workflows) -->
-                    <div id="customWorkflowType" class="form-row" style="display: none;">
-                        <div class="form-col">
                             <label>Workflow Type</label>
-                            <select class="form-control" name="workflowType">
-                                <option value="contract">Contract Management</option>
-                                <option value="vendor">Vendor Management</option>
-                                <option value="license">License Renewal</option>
-                                <option value="document">Document Review</option>
-                                <option value="budget">Budget Approval</option>
-                                <option value="procurement">Procurement Process</option>
-                                <option value="compliance">Compliance Review</option>
+                            <select class="form-control" name="workflowType" id="workflowType" required>
+                                <option value="">Select Type</option>
+                                <option value="contract">Contract</option>
+                                <option value="vendor">Vendor</option>
+                                <option value="license">License</option>
+                                <option value="document">Document</option>
+                                <option value="budget">Budget</option>
+                                <option value="procurement">Procurement</option>
+                                <option value="compliance">Compliance</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
-                        <div class="form-col">
-                            <label>Custom Type (if Other)</label>
-                            <input type="text" class="form-control" name="customType" placeholder="Enter custom type">
-                        </div>
                     </div>
 
-                    <!-- Default Workflow Info (shown for default templates) -->
-                    <div id="defaultWorkflowInfo" class="form-row" style="display: none;">
-                        <div class="form-col">
-                            <div class="info-box">
-                                <h4>Default Workflow Information</h4>
-                                <p id="defaultWorkflowDescription"></p>
-                                <p><strong>Default Approvers:</strong> <span id="defaultApprovers"></span></p>
-                                <p><strong>Estimated Duration:</strong> <span id="defaultDuration"></span></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Custom Approvers Section -->
-                    <div id="customApproversSection" class="form-row" style="display: none;">
-                        <div class="form-col">
-                            <label>Custom Approval Sequence</label>
-                            <p class="help-text">Define the approval sequence by selecting roles and their order. Each step must be completed before the next.</p>
-                            <div id="approversList">
-                                <div class="approver-item">
-                                    <div class="approver-step">
-                                        <label>Step 1:</label>
-                                        <select class="form-control approver-select" name="approvers[]" required>
-                                            <option value="">Select Role/Function</option>
-                                            <optgroup label="Management Roles">
-                                                <option value="admin@ruyatrack.com">Administrator</option>
-                                                <option value="manager@ruyatrack.com">Manager</option>
-                                            </optgroup>
-                                            <optgroup label="Functional Roles">
-                                                <option value="procurement@ruyatrack.com">Procurement Team</option>
-                                                <option value="finance@ruyatrack.com">Finance Team</option>
-                                                <option value="it@ruyatrack.com">IT Team</option>
-                                                <option value="analyst@ruyatrack.com">Business Analyst</option>
-                                            </optgroup>
-                                            <optgroup label="Specialized Roles">
-                                                <option value="legal@ruyatrack.com">Legal Team</option>
-                                                <option value="compliance@ruyatrack.com">Compliance Officer</option>
-                                                <option value="security@ruyatrack.com">Security Team</option>
-                                            </optgroup>
-                                        </select>
-                                        <input type="text" class="form-control step-description" name="stepDescriptions[]" placeholder="Step description (e.g., Technical Review, Budget Approval)" />
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeApprover(this)" style="display: none;">Remove</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="addApproverStep()">+ Add Approval Step</button>
-                        </div>
+                    <!-- Template Information Display -->
+                    <div id="templateInfo" style="display: none; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 10px; color: #2c3e50;">Template Information</h4>
+                        <div id="templateDetails"></div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-col">
-                            <label>Assigned To (Initial)</label>
-                            <select class="form-control" name="assignedTo" required>
-                                <option value="">Select User</option>
-                                <option value="admin@ruyatrack.com">Administrator</option>
-                                <option value="manager@ruyatrack.com">Manager</option>
-                                <option value="procurement@ruyatrack.com">Procurement Team</option>
-                                <option value="finance@ruyatrack.com">Finance Team</option>
-                                <option value="it@ruyatrack.com">IT Team</option>
-                                <option value="analyst@ruyatrack.com">Business Analyst</option>
-                            </select>
+                            <label>Workflow Name</label>
+                            <input type="text" class="form-control" name="name" id="workflowName" required>
                         </div>
                         <div class="form-col">
                             <label>Priority</label>
@@ -2495,6 +2378,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="form-row">
                         <div class="form-col">
                             <label>Due Date</label>
@@ -2508,10 +2392,24 @@
                             </select>
                         </div>
                     </div>
+
+                    <!-- Approval Sequence Section -->
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Approval Sequence</label>
+                            <div id="approvalSequence">
+                                <!-- Approval steps will be populated here -->
+                            </div>
+                            <button type="button" class="btn btn-secondary" onclick="addApprovalStep()" style="margin-top: 10px;">
+                                <i>➕</i> Add Approval Step
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-col">
                             <label>Description</label>
-                            <textarea class="form-control" name="description" rows="3"></textarea>
+                            <textarea class="form-control" name="description" id="workflowDescription" rows="3"></textarea>
                         </div>
                     </div>
                 </form>
@@ -2962,19 +2860,19 @@
         function loadRecentActivity() {
             const activityFeed = document.getElementById('activityFeed');
             
-            // Load real activities from localStorage
-            const storedActivities = JSON.parse(localStorage.getItem('clm_activities')) || [];
+            // Get activities from localStorage
+            let activities = JSON.parse(localStorage.getItem('activities') || '[]');
             
-            if (storedActivities.length === 0) {
-                // Show default message if no activities
+            // If no activities exist, show a message
+            if (activities.length === 0) {
                 activityFeed.innerHTML = `
                     <div class="activity-item">
                         <div class="activity-icon contract">
-                            📋
+                            📊
                         </div>
                         <div class="activity-content">
-                            <h4>No recent activities</h4>
-                            <p>Start by adding contracts, vendors, or workflows</p>
+                            <h4>Welcome to RuyaTracker CLM</h4>
+                            <p>Start by adding contracts, vendors, or workflows to see activity here</p>
                         </div>
                         <div class="activity-time">Now</div>
                     </div>
@@ -2982,32 +2880,65 @@
                 return;
             }
 
-            // Show last 5 activities
-            const recentActivities = storedActivities.slice(0, 5);
-            
-            activityFeed.innerHTML = recentActivities.map(activity => {
-                const iconMap = {
-                    'contract': '📄',
-                    'vendor': '🏢',
-                    'workflow': '⚡',
-                    'user': '👤',
-                    'report': '📊',
-                    'system': '⚙️'
-                };
-                
-                return `
-                    <div class="activity-item">
-                        <div class="activity-icon ${activity.type}">
-                            ${iconMap[activity.type] || '📋'}
-                        </div>
-                        <div class="activity-content">
-                            <h4>${activity.type.charAt(0).toUpperCase() + activity.type.slice(1)} ${activity.description.split(' ')[0]}</h4>
-                            <p>${activity.description}</p>
-                        </div>
-                        <div class="activity-time">${activity.time}</div>
+            // Sort activities by timestamp (newest first) and limit to 10
+            activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            activities = activities.slice(0, 10);
+
+            activityFeed.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${activity.type}">
+                        ${activity.icon}
                     </div>
-                `;
-            }).join('');
+                    <div class="activity-content">
+                        <h4>${activity.title}</h4>
+                        <p>${activity.description}</p>
+                    </div>
+                    <div class="activity-time">${activity.time}</div>
+                </div>
+            `).join('');
+        }
+
+        // Function to add new activity
+        function addActivity(type, icon, title, description) {
+            let activities = JSON.parse(localStorage.getItem('activities') || '[]');
+            
+            const now = new Date();
+            const timeString = formatTimeAgo(now);
+            
+            const newActivity = {
+                type: type,
+                icon: icon,
+                title: title,
+                description: description,
+                time: timeString,
+                timestamp: now.toISOString()
+            };
+            
+            activities.unshift(newActivity); // Add to beginning
+            
+            // Keep only last 50 activities
+            if (activities.length > 50) {
+                activities = activities.slice(0, 50);
+            }
+            
+            localStorage.setItem('activities', JSON.stringify(activities));
+            
+            // Refresh activity feed if we're on dashboard
+            if (document.getElementById('activityFeed')) {
+                loadRecentActivity();
+            }
+        }
+
+        // Function to format time ago
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+            return date.toLocaleDateString();
         }
 
         // Contract Functions
@@ -3054,6 +2985,10 @@
             document.getElementById('addContractModal').style.display = 'block';
         }
 
+        function saveContract() {
+            addContract(); // Call the existing addContract function
+        }
+
         function addContract() {
             const form = document.getElementById('addContractForm');
             const formData = new FormData(form);
@@ -3082,8 +3017,8 @@
             loadContractsData();
             updateDashboardKPIs();
             
-            // Add activity
-            addActivity('contract', `New contract added: ${newContract.title} (${newContract.contractId})`, currentUser.name);
+            // Add activity tracking
+            addActivity('contract', '📄', 'New contract added', `${newContract.title} (${newContract.contractId})`);
             
             showNotification(`Contract added successfully! Contract ID: ${newContract.contractId}`, 'success');
             
@@ -3343,36 +3278,28 @@
             const form = document.getElementById('addVendorForm');
             const formData = new FormData(form);
             
-            // Validate required fields
-            const requiredFields = ['name', 'contact', 'email', 'phone', 'category'];
-            for (let field of requiredFields) {
-                if (!formData.get(field)) {
-                    showNotification(`Please fill in the ${field} field`, 'error');
-                    return;
-                }
-            }
+            // Generate unique vendor ID
+            const vendorId = generateUniqueVendorId();
             
             const newVendor = {
-                id: Date.now(), // Use timestamp for unique ID
-                vendorId: generateUniqueVendorId(), // Generate unique vendor ID
+                id: vendors.length + 1,
+                vendorId: vendorId,
                 name: formData.get('name'),
                 contact: formData.get('contact'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
-                address: formData.get('address') || '',
+                address: formData.get('address'),
                 category: formData.get('category'),
-                rating: parseInt(formData.get('rating')) || 3,
+                rating: parseInt(formData.get('rating')),
                 status: 'Pending',
-                documents: formData.get('documents') ? [formData.get('documents').name] : [],
-                createdDate: new Date().toISOString().split('T')[0],
-                createdBy: currentUser?.name || 'System'
+                documents: formData.get('documents') ? [formData.get('documents').name] : []
             };
 
             vendors.push(newVendor);
             saveDataToStorage();
             
-            // Add activity
-            addActivity('vendor', `New vendor "${newVendor.name}" added and pending approval`, currentUser?.name || 'System');
+            // Add activity tracking
+            addActivity('vendor', '🏢', 'New vendor added', `${newVendor.name} - ${newVendor.category}`);
             
             closeModal('addVendorModal');
             loadVendorsData();
@@ -3380,18 +3307,16 @@
             
             // Create vendor approval workflow
             createVendorApprovalWorkflow(newVendor);
-            
-            // Reset form
-            form.reset();
         }
 
+        // Function to generate unique vendor ID
         function generateUniqueVendorId() {
             let maxId = 0;
             vendors.forEach(vendor => {
                 if (vendor.vendorId && vendor.vendorId.startsWith('VND-')) {
-                    const idNum = parseInt(vendor.vendorId.split('-')[1]);
-                    if (idNum > maxId) {
-                        maxId = idNum;
+                    const idNumber = parseInt(vendor.vendorId.split('-')[1]);
+                    if (idNumber > maxId) {
+                        maxId = idNumber;
                     }
                 }
             });
@@ -3547,250 +3472,237 @@
 
         function openAddWorkflowModal() {
             document.getElementById('addWorkflowModal').style.display = 'block';
+            // Reset form
+            document.getElementById('addWorkflowForm').reset();
+            document.getElementById('templateInfo').style.display = 'none';
+            document.getElementById('approvalSequence').innerHTML = '';
         }
 
-        // Default workflow templates
-        const defaultWorkflowTemplates = {
-            'default_contract_approval': {
+        // Workflow template definitions with global standards
+        const workflowTemplates = {
+            contract_approval: {
                 name: 'Contract Approval Workflow',
-                type: 'Contract Approval',
-                description: 'Standard workflow for contract approval process including legal review, budget approval, and final sign-off.',
-                approvers: ['procurement@ruyatrack.com', 'finance@ruyatrack.com', 'manager@ruyatrack.com'],
+                type: 'contract',
+                description: 'Standard contract approval process with legal and financial review',
                 duration: '5-7 business days',
-                steps: ['Initial Review', 'Budget Verification', 'Legal Review', 'Final Approval']
-            },
-            'default_vendor_addition': {
-                name: 'Vendor Addition Workflow',
-                type: 'Vendor Approval',
-                description: 'Standard workflow for adding new vendors including due diligence, compliance check, and approval.',
-                approvers: ['procurement@ruyatrack.com', 'admin@ruyatrack.com'],
-                duration: '3-5 business days',
-                steps: ['Vendor Verification', 'Compliance Check', 'Final Approval']
-            },
-            'default_license_renewal': {
-                name: 'License Renewal Workflow',
-                type: 'License Renewal',
-                description: 'Global standard workflow for software license renewals following industry best practices: technical assessment, budget verification, vendor negotiation, legal review, and final approval.',
-                approvers: ['it@ruyatrack.com', 'finance@ruyatrack.com', 'procurement@ruyatrack.com', 'manager@ruyatrack.com', 'admin@ruyatrack.com'],
-                duration: '7-14 business days',
                 steps: [
-                    'Technical Assessment & Usage Analysis',
-                    'Budget Verification & Cost Analysis', 
-                    'Vendor Negotiation & Terms Review',
-                    'Legal & Compliance Review',
-                    'Management Approval & Final Sign-off'
-                ],
-                globalStandard: true,
-                requirements: [
-                    'Current license usage metrics',
-                    'Budget allocation confirmation',
-                    'Vendor renewal terms',
-                    'Compliance requirements check',
-                    'Business justification'
+                    { role: 'Manager', description: 'Initial review and business justification', order: 1 },
+                    { role: 'Legal', description: 'Legal terms and compliance review', order: 2 },
+                    { role: 'Finance', description: 'Budget approval and financial impact assessment', order: 3 },
+                    { role: 'Procurement', description: 'Vendor verification and procurement process', order: 4 },
+                    { role: 'Administrator', description: 'Final approval and contract execution', order: 5 }
                 ]
             },
-            'default_document_review': {
-                name: 'Document Review Workflow',
-                type: 'Document Review',
-                description: 'Standard workflow for document review and approval process.',
-                approvers: ['analyst@ruyatrack.com', 'manager@ruyatrack.com'],
-                duration: '2-3 business days',
-                steps: ['Initial Review', 'Final Approval']
-            },
-            'default_budget_approval': {
-                name: 'Budget Approval Workflow',
-                type: 'Budget Approval',
-                description: 'Standard workflow for budget approval process including financial review and management approval.',
-                approvers: ['finance@ruyatrack.com', 'manager@ruyatrack.com', 'admin@ruyatrack.com'],
+            vendor_addition: {
+                name: 'Vendor Addition Workflow',
+                type: 'vendor',
+                description: 'Comprehensive vendor onboarding with due diligence and compliance checks',
                 duration: '3-5 business days',
-                steps: ['Financial Review', 'Management Review', 'Final Approval']
+                steps: [
+                    { role: 'Procurement', description: 'Vendor information verification and initial assessment', order: 1 },
+                    { role: 'Compliance', description: 'Due diligence and compliance verification', order: 2 },
+                    { role: 'Finance', description: 'Financial stability and payment terms review', order: 3 },
+                    { role: 'Manager', description: 'Business case approval and vendor relationship assessment', order: 4 }
+                ]
+            },
+            license_renewal: {
+                name: 'License Renewal Workflow',
+                type: 'license',
+                description: 'Global standard license renewal process with usage analysis and cost optimization',
+                duration: '2-4 business days',
+                steps: [
+                    { role: 'IT', description: 'Usage analysis and technical requirements assessment', order: 1 },
+                    { role: 'Manager', description: 'Business need validation and user count verification', order: 2 },
+                    { role: 'Finance', description: 'Budget approval and cost comparison analysis', order: 3 },
+                    { role: 'Procurement', description: 'Vendor negotiation and contract terms review', order: 4 },
+                    { role: 'Administrator', description: 'Final approval and renewal execution', order: 5 }
+                ]
+            },
+            document_review: {
+                name: 'Document Review Workflow',
+                type: 'document',
+                description: 'Standard document review and approval process',
+                duration: '2-3 business days',
+                steps: [
+                    { role: 'Analyst', description: 'Initial document review and content validation', order: 1 },
+                    { role: 'Manager', description: 'Content approval and business alignment check', order: 2 }
+                ]
+            },
+            budget_approval: {
+                name: 'Budget Approval Workflow',
+                type: 'budget',
+                description: 'Financial approval process for budget requests and expenditures',
+                duration: '3-5 business days',
+                steps: [
+                    { role: 'Manager', description: 'Business justification and initial approval', order: 1 },
+                    { role: 'Finance', description: 'Budget impact analysis and financial review', order: 2 },
+                    { role: 'Administrator', description: 'Final budget approval and allocation', order: 3 }
+                ]
+            },
+            procurement: {
+                name: 'Procurement Process Workflow',
+                type: 'procurement',
+                description: 'End-to-end procurement process with vendor selection and approval',
+                duration: '7-10 business days',
+                steps: [
+                    { role: 'Procurement', description: 'Vendor selection and RFP process management', order: 1 },
+                    { role: 'Manager', description: 'Business requirements validation and vendor assessment', order: 2 },
+                    { role: 'Finance', description: 'Cost analysis and budget approval', order: 3 },
+                    { role: 'Legal', description: 'Contract terms and legal compliance review', order: 4 },
+                    { role: 'Administrator', description: 'Final procurement approval and execution', order: 5 }
+                ]
+            },
+            compliance_check: {
+                name: 'Compliance Check Workflow',
+                type: 'compliance',
+                description: 'Regulatory compliance verification and audit process',
+                duration: '3-7 business days',
+                steps: [
+                    { role: 'Compliance', description: 'Regulatory requirements assessment and gap analysis', order: 1 },
+                    { role: 'Legal', description: 'Legal compliance verification and risk assessment', order: 2 },
+                    { role: 'Manager', description: 'Business impact review and mitigation planning', order: 3 },
+                    { role: 'Administrator', description: 'Final compliance approval and documentation', order: 4 }
+                ]
             }
         };
 
-        function handleWorkflowTemplateChange() {
-            const templateSelect = document.querySelector('select[name="template"]');
+        function loadWorkflowTemplate() {
+            const templateSelect = document.getElementById('workflowTemplate');
             const selectedTemplate = templateSelect.value;
             
-            const customWorkflowType = document.getElementById('customWorkflowType');
-            const defaultWorkflowInfo = document.getElementById('defaultWorkflowInfo');
-            const customApproversSection = document.getElementById('customApproversSection');
-            const nameInput = document.querySelector('input[name="name"]');
-            
-            // Hide all sections first
-            customWorkflowType.style.display = 'none';
-            defaultWorkflowInfo.style.display = 'none';
-            customApproversSection.style.display = 'none';
-            
-            if (selectedTemplate === 'custom') {
-                // Show custom workflow options
-                customWorkflowType.style.display = 'block';
-                customApproversSection.style.display = 'block';
-                nameInput.value = '';
-            } else if (selectedTemplate && defaultWorkflowTemplates[selectedTemplate]) {
-                // Show default workflow info
-                const template = defaultWorkflowTemplates[selectedTemplate];
-                defaultWorkflowInfo.style.display = 'block';
+            if (selectedTemplate && selectedTemplate !== 'custom') {
+                const template = workflowTemplates[selectedTemplate];
                 
-                // Populate default workflow information
-                document.getElementById('defaultWorkflowDescription').textContent = template.description;
-                document.getElementById('defaultApprovers').textContent = template.approvers.join(', ');
-                document.getElementById('defaultDuration').textContent = template.duration;
+                // Show template information
+                document.getElementById('templateInfo').style.display = 'block';
+                document.getElementById('templateDetails').innerHTML = `
+                    <p><strong>Description:</strong> ${template.description}</p>
+                    <p><strong>Estimated Duration:</strong> ${template.duration}</p>
+                    <p><strong>Default Approvers:</strong> ${template.steps.map(step => step.role).join(' → ')}</p>
+                `;
                 
-                // Pre-fill the name
-                nameInput.value = template.name;
+                // Auto-fill form fields
+                document.getElementById('workflowName').value = template.name;
+                document.getElementById('workflowType').value = template.type;
+                document.getElementById('workflowDescription').value = template.description;
+                
+                // Load approval steps
+                loadApprovalSteps(template.steps);
+            } else if (selectedTemplate === 'custom') {
+                // Hide template info for custom workflows
+                document.getElementById('templateInfo').style.display = 'none';
+                document.getElementById('workflowName').value = '';
+                document.getElementById('workflowDescription').value = '';
+                document.getElementById('approvalSequence').innerHTML = '';
+            } else {
+                document.getElementById('templateInfo').style.display = 'none';
+                document.getElementById('approvalSequence').innerHTML = '';
             }
         }
 
-        function addApproverStep() {
-            const approversList = document.getElementById('approversList');
-            const approverCount = approversList.children.length;
-            const stepNumber = approverCount + 1;
+        function loadApprovalSteps(steps) {
+            const approvalSequence = document.getElementById('approvalSequence');
+            approvalSequence.innerHTML = '';
             
-            const approverItem = document.createElement('div');
-            approverItem.className = 'approver-item';
-            approverItem.innerHTML = `
-                <div class="approver-step">
-                    <label>Step ${stepNumber}:</label>
-                    <select class="form-control approver-select" name="approvers[]" required>
-                        <option value="">Select Role/Function</option>
-                        <optgroup label="Management Roles">
-                            <option value="admin@ruyatrack.com">Administrator</option>
-                            <option value="manager@ruyatrack.com">Manager</option>
-                        </optgroup>
-                        <optgroup label="Functional Roles">
-                            <option value="procurement@ruyatrack.com">Procurement Team</option>
-                            <option value="finance@ruyatrack.com">Finance Team</option>
-                            <option value="it@ruyatrack.com">IT Team</option>
-                            <option value="analyst@ruyatrack.com">Business Analyst</option>
-                        </optgroup>
-                        <optgroup label="Specialized Roles">
-                            <option value="legal@ruyatrack.com">Legal Team</option>
-                            <option value="compliance@ruyatrack.com">Compliance Officer</option>
-                            <option value="security@ruyatrack.com">Security Team</option>
-                        </optgroup>
-                    </select>
-                    <input type="text" class="form-control step-description" name="stepDescriptions[]" placeholder="Step description (e.g., Technical Review, Budget Approval)" />
-                    <button type="button" class="btn btn-danger btn-sm" onclick="removeApprover(this)">Remove</button>
+            steps.forEach((step, index) => {
+                addApprovalStep(step.role, step.description, step.order);
+            });
+        }
+
+        let approvalStepCounter = 0;
+
+        function addApprovalStep(defaultRole = '', defaultDescription = '', defaultOrder = null) {
+            approvalStepCounter++;
+            const stepId = defaultOrder || approvalStepCounter;
+            
+            const stepHtml = `
+                <div class="approval-step" id="approvalStep${stepId}" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #fafafa;">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                        <h5 style="margin: 0; color: #2c3e50;">Step ${stepId}</h5>
+                        <button type="button" class="btn btn-danger" onclick="removeApprovalStep(${stepId})" style="padding: 5px 10px; font-size: 12px;">Remove</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label>Approver Role</label>
+                            <select class="form-control" name="approverRole${stepId}" required>
+                                <option value="">Select Role</option>
+                                <option value="Administrator" ${defaultRole === 'Administrator' ? 'selected' : ''}>Administrator</option>
+                                <option value="Manager" ${defaultRole === 'Manager' ? 'selected' : ''}>Manager</option>
+                                <option value="Procurement" ${defaultRole === 'Procurement' ? 'selected' : ''}>Procurement</option>
+                                <option value="Finance" ${defaultRole === 'Finance' ? 'selected' : ''}>Finance</option>
+                                <option value="Legal" ${defaultRole === 'Legal' ? 'selected' : ''}>Legal</option>
+                                <option value="IT" ${defaultRole === 'IT' ? 'selected' : ''}>IT</option>
+                                <option value="Compliance" ${defaultRole === 'Compliance' ? 'selected' : ''}>Compliance</option>
+                                <option value="Analyst" ${defaultRole === 'Analyst' ? 'selected' : ''}>Analyst</option>
+                            </select>
+                        </div>
+                        <div class="form-col">
+                            <label>Step Description</label>
+                            <input type="text" class="form-control" name="stepDescription${stepId}" value="${defaultDescription}" placeholder="Describe what this step involves" required>
+                        </div>
+                    </div>
                 </div>
             `;
             
-            approversList.appendChild(approverItem);
-            
-            // Show remove buttons for all items if there's more than one
-            if (stepNumber > 1) {
-                const removeButtons = approversList.querySelectorAll('.btn-danger');
-                removeButtons.forEach(btn => btn.style.display = 'inline-block');
-            }
+            document.getElementById('approvalSequence').insertAdjacentHTML('beforeend', stepHtml);
         }
 
-        // Keep the old function for backward compatibility
-        function addApprover() {
-            addApproverStep();
-        }
-        function removeApprover(button) {
-            const approverItem = button.closest('.approver-item');
-            const approversList = document.getElementById('approversList');
-            
-            // Don't remove if it's the only item
-            if (approversList.children.length <= 1) {
-                showNotification('At least one approval step is required', 'warning');
-                return;
-            }
-            
-            approverItem.remove();
-            
-            // Update step numbers
-            const remainingItems = approversList.querySelectorAll('.approver-item');
-            remainingItems.forEach((item, index) => {
-                const label = item.querySelector('label');
-                if (label) {
-                    label.textContent = `Step ${index + 1}:`;
-                }
-            });
-            
-            // Hide remove buttons if only one item remains
-            if (remainingItems.length <= 1) {
-                const removeButtons = approversList.querySelectorAll('.btn-danger');
-                removeButtons.forEach(btn => btn.style.display = 'none');
+        function removeApprovalStep(stepId) {
+            const stepElement = document.getElementById(`approvalStep${stepId}`);
+            if (stepElement) {
+                stepElement.remove();
             }
         }
 
         function saveWorkflow() {
             const form = document.getElementById('addWorkflowForm');
             const formData = new FormData(form);
-            const template = formData.get('template');
             
-            // Collect approvers for custom workflows
-            let approvers = [];
-            let approvalSteps = [];
+            // Collect approval steps
+            const approvalSteps = [];
+            const approvalSequence = document.getElementById('approvalSequence');
+            const stepElements = approvalSequence.querySelectorAll('.approval-step');
             
-            if (template === 'custom') {
-                const approverSelects = form.querySelectorAll('select[name="approvers[]"]');
-                const stepDescriptions = form.querySelectorAll('input[name="stepDescriptions[]"]');
+            stepElements.forEach((stepElement, index) => {
+                const stepId = stepElement.id.replace('approvalStep', '');
+                const role = formData.get(`approverRole${stepId}`);
+                const description = formData.get(`stepDescription${stepId}`);
                 
-                approverSelects.forEach((select, index) => {
-                    if (select.value) {
-                        const stepDescription = stepDescriptions[index]?.value || `Approval Step ${index + 1}`;
-                        approvers.push({
-                            approver: select.value,
-                            step: index + 1,
-                            description: stepDescription,
-                            status: 'Pending'
-                        });
-                    }
-                });
-                
-                // Create approval steps with descriptions
-                approvalSteps = approvers.map((approver, index) => 
-                    `Step ${approver.step}: ${approver.description} (${approver.approver.split('@')[0]})`
-                );
-            } else if (defaultWorkflowTemplates[template]) {
-                // Use default template approvers
-                const templateData = defaultWorkflowTemplates[template];
-                approvers = templateData.approvers.map((approver, index) => ({
-                    approver: approver,
-                    step: index + 1,
-                    status: 'Pending'
-                }));
-                approvalSteps = templateData.steps;
-            }
-            
-            const workflowType = template === 'custom' ? 
-                (formData.get('workflowType') === 'other' ? formData.get('customType') : formData.get('workflowType')) :
-                defaultWorkflowTemplates[template]?.type || 'Standard';
+                if (role && description) {
+                    approvalSteps.push({
+                        order: index + 1,
+                        role: role,
+                        description: description,
+                        status: 'Pending'
+                    });
+                }
+            });
             
             const newWorkflow = {
-                id: Date.now(), // Use timestamp for unique ID
+                id: workflows.length + 1,
                 workflowId: `WF-2024-${String(workflows.length + 1).padStart(3, '0')}`,
                 name: formData.get('name'),
-                template: template,
-                type: workflowType,
+                type: formData.get('workflowType'),
+                template: document.getElementById('workflowTemplate').value,
                 status: 'Active',
-                assignedTo: formData.get('assignedTo'),
+                approvalSteps: approvalSteps,
+                autoApply: formData.get('autoApply') === 'true',
                 createdDate: new Date().toISOString().split('T')[0],
                 dueDate: formData.get('dueDate'),
                 priority: formData.get('priority'),
                 description: formData.get('description'),
-                autoApply: formData.get('autoApply') === 'true',
-                approvers: approvers,
-                approvalSteps: approvalSteps,
-                isCustom: template === 'custom',
-                currentStep: 1,
-                createdBy: currentUser?.name || 'System'
+                createdBy: currentUser.name
             };
 
             workflows.push(newWorkflow);
             saveDataToStorage();
             
+            // Add activity tracking
+            addActivity('workflow', '⚡', 'New workflow created', `${newWorkflow.name} (${newWorkflow.workflowId})`);
+            
             closeModal('addWorkflowModal');
             loadWorkflowsData();
-            showNotification(`${template === 'custom' ? 'Custom' : 'Default'} workflow created successfully!`, 'success');
-            
-            // Reset form
-            form.reset();
-            document.getElementById('customWorkflowType').style.display = 'none';
-            document.getElementById('defaultWorkflowInfo').style.display = 'none';
-            document.getElementById('customApproversSection').style.display = 'none';
+            showNotification('Workflow created successfully!', 'success');
         }
 
         function viewWorkflow(id) {
@@ -4613,95 +4525,18 @@
                 return;
             }
 
-            // Generate comprehensive contract report
-            const reportContent = generateReportContent(contracts);
+            // Create report content
+            const reportHTML = createReportHTML(contracts);
             
-            // Create a new window to display the report
+            // Try to open in new window
             const newWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
-            
             if (newWindow) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Contract Management Report</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-                            .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-                            .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-                            .summary-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
-                            .summary-card h3 { margin: 0; color: #333; }
-                            .summary-card .value { font-size: 2em; font-weight: bold; color: #007bff; }
-                            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-                            th { background-color: #f8f9fa; font-weight: bold; }
-                            .status-active { color: #28a745; font-weight: bold; }
-                            .status-pending { color: #ffc107; font-weight: bold; }
-                            .status-expired { color: #dc3545; font-weight: bold; }
-                            .print-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px; }
-                            @media print { .print-btn { display: none; } }
-                        </style>
-                    </head>
-                    <body>
-                        ${reportContent}
-                        <div style="text-align: center; margin-top: 30px;">
-                            <button class="print-btn" onclick="window.print()">Print Report</button>
-                            <button class="print-btn" onclick="downloadReport()">Download HTML</button>
-                        </div>
-                        <script>
-                            function downloadReport() {
-                                const content = document.documentElement.outerHTML;
-                                const blob = new Blob([content], { type: 'text/html' });
-                                const url = URL.createObjectURL(blob);
-                                const a = document.createElement('a');
-                                a.href = url;
-                                a.download = 'contract_report_' + new Date().toISOString().split('T')[0] + '.html';
-                                document.body.appendChild(a);
-                                a.click();
-                                document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
-                            }
-                        </script>
-                    </body>
-                    </html>
-                `);
+                newWindow.document.write(reportHTML);
                 newWindow.document.close();
-                
-                // Add activity
-                addActivity('report', 'Contract report generated with ' + contracts.length + ' contracts', currentUser?.name || 'System');
                 showNotification('Contract report generated and opened in new window!', 'success');
             } else {
-                // Fallback if popup is blocked
-                showNotification('Popup blocked. Please allow popups to view reports.', 'warning');
-                
-                // Alternative: download the report
-                const content = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Contract Management Report</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-                            .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-                            .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-                            .summary-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
-                            .summary-card h3 { margin: 0; color: #333; }
-                            .summary-card .value { font-size: 2em; font-weight: bold; color: #007bff; }
-                            table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-                            th { background-color: #f8f9fa; font-weight: bold; }
-                            .status-active { color: #28a745; font-weight: bold; }
-                            .status-pending { color: #ffc107; font-weight: bold; }
-                            .status-expired { color: #dc3545; font-weight: bold; }
-                        </style>
-                    </head>
-                    <body>
-                        ${reportContent}
-                    </body>
-                    </html>
-                `;
-                
-                const blob = new Blob([content], { type: 'text/html' });
+                // Fallback: download report
+                const blob = new Blob([reportHTML], { type: 'text/html' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -4710,119 +4545,16 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
-                addActivity('report', 'Contract report downloaded with ' + contracts.length + ' contracts', currentUser?.name || 'System');
                 showNotification('Contract report downloaded successfully!', 'success');
             }
         }
 
-        function generateReportContent(contracts) {
+        function createReportHTML(contracts) {
             const totalContracts = contracts.length;
             const activeContracts = contracts.filter(c => c.status === 'Active').length;
-            const pendingContracts = contracts.filter(c => c.status === 'Pending').length;
-            const expiredContracts = contracts.filter(c => c.status === 'Expired').length;
             const totalValue = contracts.reduce((sum, c) => sum + (parseFloat(c.value) || 0), 0);
             
-            // Get unique vendors
-            const uniqueVendors = [...new Set(contracts.map(c => c.vendor))].length;
-            
-            // Upcoming renewals (contracts ending in next 30 days)
-            const today = new Date();
-            const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
-            const upcomingRenewals = contracts.filter(c => {
-                const endDate = new Date(c.endDate);
-                return endDate >= today && endDate <= thirtyDaysFromNow;
-            }).length;
-
-            return `
-                <div class="header">
-                    <h1>Contract Management Report</h1>
-                    <p>Generated on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB')}</p>
-                    <p>RuyaTracker CLM Enterprise</p>
-                </div>
-
-                <div class="summary">
-                    <div class="summary-card">
-                        <h3>Total Contracts</h3>
-                        <div class="value">${totalContracts}</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Active Contracts</h3>
-                        <div class="value">${activeContracts}</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Pending Approvals</h3>
-                        <div class="value">${pendingContracts}</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Total Value</h3>
-                        <div class="value">${totalValue.toLocaleString()} SAR</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Unique Vendors</h3>
-                        <div class="value">${uniqueVendors}</div>
-                    </div>
-                    <div class="summary-card">
-                        <h3>Upcoming Renewals</h3>
-                        <div class="value">${upcomingRenewals}</div>
-                    </div>
-                </div>
-
-                <h2>Contract Details</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Contract ID</th>
-                            <th>Title</th>
-                            <th>Vendor</th>
-                            <th>Value (SAR)</th>
-                            <th>Status</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Days Remaining</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${contracts.map(contract => {
-                            const endDate = new Date(contract.endDate);
-                            const daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
-                            const statusClass = contract.status.toLowerCase().replace(' ', '-');
-                            
-                            return `
-                                <tr>
-                                    <td>${contract.contractId}</td>
-                                    <td>${contract.title}</td>
-                                    <td>${contract.vendor}</td>
-                                    <td>${parseFloat(contract.value || 0).toLocaleString()}</td>
-                                    <td><span class="status-${statusClass}">${contract.status}</span></td>
-                                    <td>${contract.startDate}</td>
-                                    <td>${contract.endDate}</td>
-                                    <td>${daysRemaining > 0 ? daysRemaining + ' days' : 'Expired'}</td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-
-                <h2>Analysis & Insights</h2>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                    <h3>Portfolio Health</h3>
-                    <ul>
-                        <li><strong>Contract Distribution:</strong> ${activeContracts} active (${Math.round(activeContracts/totalContracts*100)}%), ${pendingContracts} pending (${Math.round(pendingContracts/totalContracts*100)}%), ${expiredContracts} expired (${Math.round(expiredContracts/totalContracts*100)}%)</li>
-                        <li><strong>Vendor Diversity:</strong> ${uniqueVendors} unique vendors across ${totalContracts} contracts</li>
-                        <li><strong>Renewal Planning:</strong> ${upcomingRenewals} contracts require renewal attention in the next 30 days</li>
-                        <li><strong>Portfolio Value:</strong> Total contract value of ${totalValue.toLocaleString()} SAR</li>
-                    </ul>
-                    
-                    <h3>Recommendations</h3>
-                    <ul>
-                        ${upcomingRenewals > 0 ? `<li>⚠️ <strong>Urgent:</strong> ${upcomingRenewals} contracts expiring soon - initiate renewal process</li>` : ''}
-                        ${pendingContracts > 0 ? `<li>📋 <strong>Action Required:</strong> ${pendingContracts} contracts pending approval</li>` : ''}
-                        <li>📊 <strong>Optimization:</strong> Consider vendor consolidation opportunities with ${uniqueVendors} current vendors</li>
-                        <li>🔄 <strong>Process:</strong> Implement automated renewal reminders for better contract lifecycle management</li>
-                    </ul>
-                </div>
-            `;
+            return '<!DOCTYPE html><html><head><title>Contract Report</title><style>body{font-family:Arial,sans-serif;margin:20px;}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:20px;}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:20px 0;}.stat-card{background:#f8f9fa;padding:20px;border-radius:8px;text-align:center;}.stat-number{font-size:2em;font-weight:bold;color:#007bff;}table{width:100%;border-collapse:collapse;margin:20px 0;}th,td{border:1px solid #ddd;padding:12px;text-align:left;}th{background-color:#f8f9fa;}</style></head><body><div class="header"><h1>Contract Management Report</h1><p>Generated on ' + new Date().toLocaleDateString() + '</p></div><div class="stats"><div class="stat-card"><div class="stat-number">' + totalContracts + '</div><div>Total Contracts</div></div><div class="stat-card"><div class="stat-number">' + activeContracts + '</div><div>Active Contracts</div></div><div class="stat-card"><div class="stat-number">' + totalValue.toLocaleString() + ' SAR</div><div>Total Value</div></div></div><h2>Contract Details</h2><table><thead><tr><th>Contract ID</th><th>Title</th><th>Vendor</th><th>Value (SAR)</th><th>Status</th><th>Start Date</th><th>End Date</th></tr></thead><tbody>' + contracts.map(contract => '<tr><td>' + contract.contractId + '</td><td>' + contract.title + '</td><td>' + contract.vendor + '</td><td>' + parseFloat(contract.value || 0).toLocaleString() + '</td><td>' + contract.status + '</td><td>' + contract.startDate + '</td><td>' + contract.endDate + '</td></tr>').join('') + '</tbody></table></body></html>';
         }
 
         function exportReport(format) {
